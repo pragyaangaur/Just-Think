@@ -22,14 +22,14 @@ def _replace_hidden(output, h):
 
 class Steerer:
     def __init__(self, repo, steer_layer, monitor_layer, pain_vector, name=None, dtype=torch.bfloat16,
-                 quantize_4bit=False, device_map="auto", attn_implementation="sdpa"):
+                 quantize_4bit=False, device_map="auto", attn_implementation="sdpa", revision=None):
         self.name = name or repo
-        kw = dict(torch_dtype=dtype, device_map=device_map, attn_implementation=attn_implementation)
+        kw = dict(torch_dtype=dtype, device_map=device_map, attn_implementation=attn_implementation, revision=revision)
         if quantize_4bit:
             from transformers import BitsAndBytesConfig
             kw["quantization_config"] = BitsAndBytesConfig(
                 load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=dtype)
-        self.tok = AutoTokenizer.from_pretrained(repo)
+        self.tok = AutoTokenizer.from_pretrained(repo, revision=revision)
         self.model = AutoModelForCausalLM.from_pretrained(repo, **kw).eval()
         self.d = pain_vector.shape[0]
         layers = self.model.model.layers

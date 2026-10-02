@@ -27,6 +27,7 @@ PLANS = {
     # Cross-model replication on Kaggle: the primary arms only.
     "replication": {"A": 100, "C": 100, "D": 100},
     "smoke": {a: 2 for a in P.ARMS},
+    "smoke8": {a: 8 for a in P.ARMS},
 }
 
 
