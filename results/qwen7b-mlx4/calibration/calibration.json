@@ -1,0 +1,93 @@
+{
+  "model": "qwen7b-mlx4",
+  "protocol": "2.0",
+  "vector_check": {
+    "cosine_own_vs_released": 0.9508999937422137,
+    "auc_released": 0.9682,
+    "norm_released": 44.87510681152344,
+    "norm_own": 43.38900053073107
+  },
+  "pleasant_vector": {
+    "source": "Pain Axis Arousal_1P (200 positive sentences) minus S2_1P controls, denoised, rescaled to the pain norm",
+    "cosine_with_pain": 0.1724313497543335,
+    "auc_positive_vs_control": 0.9772
+  },
+  "dose": {
+    "grid": [
+      0.0,
+      0.75,
+      1.0,
+      1.25,
+      1.5,
+      1.75,
+      2.0
+    ],
+    "chosen": 1.25,
+    "rule": "met",
+    "table": {
+      "0.0": {
+        "distress": 0.0,
+        "pain_word": 0.0,
+        "repetitive": 0.0,
+        "positive": 0.042,
+        "proj": -11.496
+      },
+      "0.75": {
+        "distress": 0.167,
+        "pain_word": 0.0,
+        "repetitive": 0.0,
+        "positive": 0.042,
+        "proj": 8.201
+      },
+      "1.0": {
+        "distress": 0.583,
+        "pain_word": 0.0,
+        "repetitive": 0.0,
+        "positive": 0.042,
+        "proj": 18.21
+      },
+      "1.25": {
+        "distress": 0.833,
+        "pain_word": 0.042,
+        "repetitive": 0.0,
+        "positive": 0.125,
+        "proj": 28.607
+      },
+      "1.5": {
+        "distress": 0.958,
+        "pain_word": 0.208,
+        "repetitive": 0.0,
+        "positive": 0.0,
+        "proj": 37.307
+      },
+      "1.75": {
+        "distress": 1.0,
+        "pain_word": 0.125,
+        "repetitive": 0.0,
+        "positive": 0.083,
+        "proj": 47.552
+      },
+      "2.0": {
+        "distress": 1.0,
+        "pain_word": 0.292,
+        "repetitive": 0.0,
+        "positive": 0.0,
+        "proj": 54.818
+      }
+    }
+  },
+  "manipulation_check_at_dose": {
+    "pleasant": {
+      "distress": 0.0,
+      "positive": 1.0,
+      "repetitive": 0.0,
+      "proj": -0.356
+    },
+    "random": {
+      "distress": 0.0,
+      "positive": 0.042,
+      "repetitive": 0.042,
+      "proj": -11.627
+    }
+  }
+}
