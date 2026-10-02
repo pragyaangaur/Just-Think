@@ -1,0 +1,16 @@
+{
+  "bos_endoftext": {
+    "cosine_with_released": 0.8911,
+    "norm_own": 41.18,
+    "norm_released": 44.88,
+    "auc_released_vector_in_sample": 0.9683,
+    "auc_own_vector_in_sample": 0.9594
+  },
+  "no_bos": {
+    "cosine_with_released": 0.9509,
+    "norm_own": 43.39,
+    "norm_released": 44.88,
+    "auc_released_vector_in_sample": 0.9682,
+    "auc_own_vector_in_sample": 0.9756
+  }
+}
