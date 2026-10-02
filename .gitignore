@@ -1,0 +1,16 @@
+# Environment and caches
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+
+# Downloaded weights and the cloned Pain Axis repository (see scripts/setup.sh)
+models/
+external/
+
+# Private drafts that do not belong in the public repository
+outreach/
+
+# Run logs
+*.log
