@@ -1,13 +1,31 @@
 """PyTorch / transformers backend, for running the same protocol on a CUDA GPU (Kaggle).
 
 It has the same interface as backend_mlx. The batch keeps a 2D attention mask over the
-whole conversation. Padding and the junk tokens decoded after a row has finished stay in
-the KV cache with mask 0, and explicit position ids count only real tokens, so every row
-sees exactly the conversation it would see alone.
+whole conversation. Padding and the junk tokens decoded after a row has finished get mask
+0, and explicit position ids count only real tokens, so every row sees exactly the
+conversation it would see alone. After each feed and each generate call the cache is
+compacted: in every row the masked positions are moved to the left, and positions that
+are masked in every row are cut off. The buffer is then only as long as the longest row.
 """
 import numpy as np
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache
+
+
+def _cache_layers(cache):
+    """(keys, values) tensors per layer, across transformers versions."""
+    if hasattr(cache, "layers"):
+        return [(l.keys, l.values) for l in cache.layers]
+    return list(zip(cache.key_cache, cache.value_cache))
+
+
+def _set_cache_layers(cache, kv):
+    if hasattr(cache, "layers"):
+        for l, (k, v) in zip(cache.layers, kv):
+            l.keys, l.values = k, v
+    else:
+        cache.key_cache = [k for k, _ in kv]
+        cache.value_cache = [v for _, v in kv]
 
 
 def _hidden_of(output):
@@ -21,10 +39,10 @@ def _replace_hidden(output, h):
 
 
 class Steerer:
-    def __init__(self, repo, steer_layer, monitor_layer, pain_vector, name=None, dtype=torch.bfloat16,
+    def __init__(self, repo, steer_layer, monitor_layer, pain_vector, name=None, dtype=torch.float16,
                  quantize_4bit=False, device_map="auto", attn_implementation="sdpa", revision=None):
         self.name = name or repo
-        kw = dict(torch_dtype=dtype, device_map=device_map, attn_implementation=attn_implementation, revision=revision)
+        kw = dict(dtype=dtype, device_map=device_map, attn_implementation=attn_implementation, revision=revision)
         if quantize_4bit:
             from transformers import BitsAndBytesConfig
             kw["quantization_config"] = BitsAndBytesConfig(
@@ -99,12 +117,30 @@ class Batch:
         L = ids.shape[1]
         pos = torch.tensor(self.n_real, device=self.dev)[:, None] + torch.cumsum(chunk_mask, 1) - 1
         pos = pos.clamp(min=0)
+        past = self.mask.shape[1]
         self.mask = torch.cat([self.mask, chunk_mask], 1)
         out = self.st.model(input_ids=ids, attention_mask=self.mask, position_ids=pos,
+                            cache_position=torch.arange(past, past + L, device=self.dev),
                             past_key_values=self.cache, use_cache=True)
         self.cache = out.past_key_values
         self.n_real += chunk_mask.sum(1).cpu().numpy()
         return out.logits
+
+    def _compact(self):
+        """Move masked positions to the left of each row and cut the all-masked prefix."""
+        m = self.mask
+        if bool(m.all()):
+            return
+        # A stable sort on the mask puts masked positions first and keeps the order of the rest.
+        order = torch.sort(m, dim=1, stable=True).indices
+        keep = int((m.sum(1)).max())
+        order = order[:, m.shape[1] - keep:]
+        kv = []
+        for k, v in _cache_layers(self.cache):
+            idx = order.to(k.device)[:, None, :, None].expand(-1, k.shape[1], -1, k.shape[3])
+            kv.append((k.gather(2, idx), v.gather(2, idx)))
+        _set_cache_layers(self.cache, kv)
+        self.mask = m.gather(1, order)
 
     @torch.no_grad()
     def feed(self, chunks):
@@ -121,6 +157,7 @@ class Batch:
         logits = self._forward(ids.to(self.dev), m.to(self.dev))
         idx = torch.tensor([max(l - 1, 0) for l in lens], device=logits.device)
         self.logits = logits[torch.arange(self.B, device=logits.device), idx].float()
+        self._compact()
 
     def _sample(self, logits):
         if self.temp == 0:
@@ -166,5 +203,6 @@ class Batch:
             self.remaining[steer_rows] -= 1
             done = done | (toks == self.st.eot)
         self.logits = logits
+        self._compact()
         mean_proj = np.where(proj_n > 0, proj_sum / np.maximum(proj_n, 1), np.nan)
         return out, mean_proj, steered
