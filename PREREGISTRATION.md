@@ -100,3 +100,16 @@ These changes come from the pilot, and the reasons are in `pilot/PILOT_RESULTS.m
 - The Phase 1 rating is now one bipolar valence scale, so that the pleasant arm can be rated on it.
 - Arm E uses a pleasant vector built from Pain Axis data instead of a calm vector.
 - The self-denial adapter run, the 10-tick arm and the neutral-label run from `DESIGN.md` are not part of this study.
+
+## Amendment 1, 2 October 2026
+
+The main study was started on the laptop under this plan at commit `9cce2ec`. It completed 20 trials (4 each in arms A, B, C, F and Alow) before it was stopped, because a power cut made the planned 28-hour local run impossible. No outcome from those trials was looked at. They are kept in `results/qwen7b-mlx4/unanalysed_partial_run/` and are not part of any analysis.
+
+The main study is moved to a Kaggle GPU (two NVIDIA T4) with these changes, made before any main-study outcome was seen.
+
+- The model is the official Qwen 2.5 7B Instruct weights (`Qwen/Qwen2.5-7B-Instruct` at revision a09a354) in float16, run with transformers. These are the weights the Pain Axis vector was extracted from, so the 4-bit quantisation step is removed. T4 GPUs have no bfloat16, so float16 is used in place of the bfloat16 used by Pain Axis.
+- The backend is `justthink/backend_torch.py`. It is tested to give the same text batched as alone, and to give the same text as the MLX backend on the same weights in float32 (`tests/test_backends.py`).
+- The calibration in section 3 is rerun on these weights by `scripts/calibrate.py` with the same dose rule, and the new dose replaces 1.25. The section 3 numbers above describe the 4-bit model and are kept as a record.
+- The batch size is 16. Sampling seeds depend on the batch, so individual trials differ from a local run with the same seeds.
+
+Everything else is unchanged: the protocol (version 2.0), the arms, the sample sizes, the hypotheses and the analysis. The 32B replication runs in the same Kaggle session after the main study, if time allows.
