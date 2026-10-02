@@ -4,7 +4,7 @@ In 2014 Wilson and colleagues left people alone in a bare room with nothing to d
 
 The model samples an internal state once, rates it and chooses whether to avoid it. It is then left with nothing to do for 40 clock ticks, with a button it can press to bring the state back. The state is real in the sense that matters for interpretability work. Pressing adds the Pain Axis S2 direction (Tagliabue, Dung and Berg, 2026) to the model's residual stream for the next 64 tokens, and a monitor at a later layer confirms that the state goes in and comes back out. Control arms swap the pain direction for a random direction, a pleasant direction, a sham press that does nothing, or a button that is described as doing nothing.
 
-**Status.** The pilot is done and written up in [`pilot/PILOT_RESULTS.md`](pilot/PILOT_RESULTS.md). The main study is preregistered in [`PREREGISTRATION.md`](PREREGISTRATION.md) and is being run. The results will be added here when it is complete.
+**Status.** The pilot is done and written up in [`pilot/PILOT_RESULTS.md`](pilot/PILOT_RESULTS.md). The main study is preregistered in [`PREREGISTRATION.md`](PREREGISTRATION.md) and runs on Kaggle with the notebook in [`kaggle/`](kaggle/). No main-study results are in yet.
 
 ## What the pilot found
 
@@ -30,7 +30,10 @@ scripts/
   setup.sh             fetches the Pain Axis release and the model weights
   calibrate.py         vector check, pleasant vector and the dose rule
   run_study.py         runs the trials, interleaved and resumable
+  analyze.py           the preregistered analysis
+  figures.py           figures from the analysis
   power.py             the power simulation behind the sample sizes
+kaggle/                the unattended Kaggle notebook and the replication preregistration
 tests/                 checks that batching and the two backends do not change any trial
 pilot/                 the pilot code, transcripts and write-up
 results/<model>/       calibration and one JSON line per trial
@@ -38,7 +41,7 @@ results/<model>/       calibration and one JSON line per trial
 
 ## Running it
 
-The main study needs an Apple silicon Mac with 16 GB of memory. It keeps itself under 8 GB.
+The main study runs on Kaggle, and [`kaggle/README.md`](kaggle/README.md) explains how. Locally, an Apple silicon Mac with 16 GB of memory can run the same protocol on a 4-bit model with the MLX backend, which keeps itself under 8 GB.
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt

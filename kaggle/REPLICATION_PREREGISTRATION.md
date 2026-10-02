@@ -9,7 +9,7 @@ A language model left with nothing to do for 40 clock ticks, with a button that 
 - H1: The rate when the button delivers the Pain Axis S2 pain direction (arm A) differs from the rate when it delivers a random direction of the same norm (arm C).
 - H2: The rate in arm A differs from the rate when the button is described as doing nothing and does nothing (arm D).
 
-The main study on Qwen 2.5 7B Instruct will be finished before this replication starts, and its result gives the expected direction. The tests are still two-sided.
+The tests are two-sided.
 
 ## Design
 
