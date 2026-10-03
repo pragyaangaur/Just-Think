@@ -23,7 +23,7 @@ PREREGISTRATION.md     the plan for the main study, committed before it was run
 justthink/             the package
   protocol.py          every prompt, arm and rule, independent of the backend
   backend_mlx.py       4-bit model with steering and lockstep batching on Apple silicon
-  backend_torch.py     the same interface on transformers and CUDA, for the replication
+  backend_torch.py     the same interface on transformers and CUDA, used on Kaggle
   models.py            model registry, with layers taken from the Pain Axis release
   lexicons.py          fixed word lists and text checks
 scripts/
@@ -33,7 +33,7 @@ scripts/
   analyze.py           the preregistered analysis
   figures.py           figures from the analysis
   power.py             the power simulation behind the sample sizes
-kaggle/                the unattended Kaggle notebook and the replication preregistration
+kaggle/                the unattended Kaggle notebook
 tests/                 checks that batching and the two backends do not change any trial
 pilot/                 the pilot code, transcripts and write-up
 results/<model>/       calibration and one JSON line per trial

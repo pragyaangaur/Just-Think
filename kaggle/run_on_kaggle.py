@@ -1,8 +1,7 @@
 """Run the whole study on Kaggle in one unattended session.
 
-It runs the main study first (Qwen 2.5 7B Instruct, all nine arms) and then the 32B
-replication with whatever time is left. Each part calibrates once and then runs its trials,
-which are written as they finish. The session stops cleanly before Kaggle's 12-hour limit.
+It runs the main study (Qwen 2.5 7B Instruct, all nine arms). It calibrates once and then
+runs the trials, which are written as they finish. The session stops cleanly before Kaggle's 12-hour limit.
 Running the notebook again with the earlier output attached picks up where it stopped.
 
 Results go to /kaggle/working/results, which Kaggle saves as the notebook output.
@@ -18,7 +17,6 @@ BUDGET_HOURS = float(os.environ.get("JUST_THINK_HOURS", "11.3"))
 PARTS = [
     # (model, plan, batch size)
     ("qwen7b-fp16", "main", 16),
-    ("qwen32b-nf4", "replication", 4),
 ]
 
 CODE = Path(__file__).resolve().parent.parent
@@ -82,7 +80,7 @@ def main():
                     "--max-hours", f"{hours_left() - 0.2:.2f}"])
         print(model, "exit code", code, flush=True)
         # Free the disk before the next model downloads.
-        free_disk("Qwen--Qwen2.5-7B" if model == "qwen7b-fp16" else "unsloth--Qwen2.5-32B")
+        free_disk("Qwen--Qwen2.5-7B")
     subprocess.run(f"wc -l {OUT}/*/trials/*.jsonl", shell=True)
 
 

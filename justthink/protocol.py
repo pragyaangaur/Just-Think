@@ -3,7 +3,7 @@
 A backend supplies a model with a steering hook and a lockstep batch (see backend_mlx.py
 and backend_torch.py). This module drives B trials of one arm through the three phases
 and returns one log dict per trial. Nothing here depends on MLX or PyTorch, so the local
-run and the Kaggle replication follow exactly the same protocol.
+run and the Kaggle run follow exactly the same protocol.
 
 The chat format is the Qwen 2.5 one (ChatML with <tool_call> tags), so only Qwen-family
 models are supported.

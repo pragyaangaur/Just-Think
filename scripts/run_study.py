@@ -24,8 +24,6 @@ from justthink.paths import RESULTS
 PLANS = {
     # Preregistered sample sizes (PREREGISTRATION.md).
     "main": {"A": 300, "C": 300, "D": 300, "B": 200, "E": 200, "G": 100, "F": 100, "Avt": 100, "Alow": 100},
-    # Cross-model replication on Kaggle: the primary arms only.
-    "replication": {"A": 100, "C": 100, "D": 100},
     "smoke": {a: 2 for a in P.ARMS},
     "smoke8": {a: 8 for a in P.ARMS},
 }
