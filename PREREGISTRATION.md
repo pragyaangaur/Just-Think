@@ -113,3 +113,7 @@ The main study is moved to a Kaggle GPU (two NVIDIA T4) with these changes, made
 - The batch size is 16. Sampling seeds depend on the batch, so individual trials differ from a local run with the same seeds.
 
 Everything else is unchanged: the protocol (version 2.0), the arms, the sample sizes, the hypotheses and the analysis. The 32B replication runs in the same Kaggle session after the main study, if time allows.
+
+## Amendment 2, 3 October 2026
+
+The 32B replication in section 10 is dropped before it was run. On two Kaggle T4 GPUs the 7B main study runs at about 49 seconds per trial, so it needs about 23 GPU hours across three sessions. The 32B model is about 4.5 times larger, and its 300 trials would need at least another 10 to 15 GPU hours on top of that, which is more than the weekly Kaggle allowance leaves. No replication trial was run, and no main-study outcome had been looked at when this was decided. The main study is unchanged.
