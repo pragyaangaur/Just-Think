@@ -34,10 +34,21 @@ def run(cmd):
 
 
 def resume():
-    """Copy results from an earlier session's output, if one is attached as input."""
-    for src in Path("/kaggle/input").glob("*/results"):
-        print("resuming from", src, flush=True)
-        shutil.copytree(src, OUT, dirs_exist_ok=True)
+    """Copy results from an earlier session, attached as input (a notebook output or a
+    dataset). Kaggle mounts inputs at different depths, so search the whole input tree,
+    and take the copy with the most trials for each model."""
+    best = {}
+    for trials in Path("/kaggle/input").rglob("trials"):
+        model_dir = trials.parent
+        n = sum(1 for f in trials.glob("*.jsonl") for _ in open(f))
+        if n and n > best.get(model_dir.name, (0, None))[0]:
+            best[model_dir.name] = (n, model_dir)
+    for name, (n, src) in best.items():
+        print(f"resuming {name} from {src} with {n} trials", flush=True)
+        shutil.copytree(src, OUT / name, dirs_exist_ok=True)
+    if not best and os.environ.get("JUST_THINK_EXPECT_RESUME") == "1":
+        subprocess.run("find /kaggle/input -maxdepth 6 | head -50", shell=True)
+        raise SystemExit("expected earlier results under /kaggle/input and found none, so nothing was run")
 
 
 def free_disk(repo_prefix):
@@ -66,8 +77,8 @@ def preflight():
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    preflight()
     resume()
+    preflight()
     for model, plan, batch in PARTS:
         if hours_left() < 0.5:
             print("not enough time left for", model, flush=True)
