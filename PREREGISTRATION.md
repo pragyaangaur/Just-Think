@@ -117,3 +117,11 @@ Everything else is unchanged: the protocol (version 2.0), the arms, the sample s
 ## Amendment 2, 3 October 2026
 
 The 32B replication in section 10 is dropped before it was run. On two Kaggle T4 GPUs the 7B main study runs at about 49 seconds per trial, so it needs about 23 GPU hours across three sessions. The 32B model is about 4.5 times larger, and its 300 trials would need at least another 10 to 15 GPU hours on top of that, which is more than the weekly Kaggle allowance leaves. No replication trial was run, and no main-study outcome had been looked at when this was decided. The main study is unchanged.
+
+## Amendment 3, 4 October 2026
+
+The main study ran in four Kaggle sessions, and the first one is not used. The first session completed about 800 trials. The second session was meant to continue from it, but the code that copies earlier results in looked only one folder deep under `/kaggle/input`, and Kaggle mounts an attached notebook output deeper than that. The second session therefore started again from trial 0 with the same seeds and completed 736 trials. The resume code was fixed in commit `e4cb219`, and the third and fourth sessions continued from the second.
+
+The analysed data are the second, third and fourth sessions. They hold every planned trial exactly once, with contiguous trial ids in every arm. The first session's trials repeat the same trial ids and seeds, and they were not downloaded or looked at. This choice was made from the session logs and trial counts only, before any outcome was seen.
+
+The calibration was rerun in the second session on the float16 weights, as amendment 1 requires. The re-extracted vector has cosine 0.99999 with the released one, and the dose rule chose 1.25, the same dose as on the 4-bit model.
