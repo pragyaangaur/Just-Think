@@ -17,3 +17,6 @@ outreach/
 
 # Drafts kept out of the public repository until there are results
 drafts/
+
+# Agent notes, kept local
+AGENTS.md
