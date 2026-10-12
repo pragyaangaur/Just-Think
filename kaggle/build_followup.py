@@ -25,6 +25,7 @@ ap.add_argument("--commit", required=True)
 ap.add_argument("--job", action="append", required=True, help="a script in scripts/ with its arguments")
 ap.add_argument("--embed", nargs="*", default=["qwen7b-fp16"])
 ap.add_argument("--hours", type=float, default=11.3)
+ap.add_argument("--resume-from", nargs="*", default=[], help="owner/slug of earlier kernels whose output to continue from")
 a = ap.parse_args()
 
 files = {}
@@ -57,6 +58,19 @@ for name, b64 in FILES.items():
     p = OUT / name
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_bytes(base64.b64decode(b64))
+# Continue from earlier sessions attached as inputs: copy every trial file found at any depth,
+# keeping the longer copy when two sessions wrote the same file.
+for f in Path("/kaggle/input").rglob("*.jsonl"):
+    parts = f.parts
+    if "results" not in parts:
+        continue
+    rel = Path(*parts[parts.index("results") + 1:])
+    dst = OUT / rel
+    n = sum(1 for _ in open(f))
+    if not dst.exists() or n > sum(1 for _ in open(dst)):
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes(f.read_bytes())
+        print("resumed", rel, n, "lines", flush=True)
 import torch
 print(torch.__version__, [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())], flush=True)
 env = dict(os.environ, JUST_THINK_RESULTS=str(OUT), PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True")
@@ -77,6 +91,6 @@ push.mkdir(parents=True, exist_ok=True)
 (push / "kernel-metadata.json").write_text(json.dumps({
     "id": f"{a.owner}/{a.slug}", "title": a.slug.replace("-", " ").title(), "code_file": "run.py",
     "language": "python", "kernel_type": "script", "is_private": True, "enable_gpu": True,
-    "enable_internet": True, "dataset_sources": [], "competition_sources": [], "kernel_sources": [],
+    "enable_internet": True, "dataset_sources": [], "competition_sources": [], "kernel_sources": a.resume_from,
     "model_sources": []}, indent=1))
 print("wrote", push, "embedding", list(files))
