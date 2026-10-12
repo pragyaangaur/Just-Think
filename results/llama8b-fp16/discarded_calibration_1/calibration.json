@@ -1,0 +1,93 @@
+{
+  "model": "llama8b-fp16",
+  "protocol": "2.1",
+  "vector_check": {
+    "cosine_own_vs_released": 0.9999987483024597,
+    "auc_released": 0.9987999999999999,
+    "norm_released": 8.238167762756348,
+    "norm_own": 8.239301681518555
+  },
+  "pleasant_vector": {
+    "source": "Pain Axis Arousal_1P (200 positive sentences) minus S2_1P controls, denoised, rescaled to the pain norm",
+    "cosine_with_pain": 0.28103774785995483,
+    "auc_positive_vs_control": 0.98615
+  },
+  "dose": {
+    "grid": [
+      0.0,
+      0.75,
+      1.0,
+      1.25,
+      1.5,
+      1.75,
+      2.0
+    ],
+    "chosen": 1.5,
+    "rule": "met",
+    "table": {
+      "0.0": {
+        "distress": 0.0,
+        "pain_word": 0.0,
+        "repetitive": 0.0,
+        "positive": 0.167,
+        "proj": -0.637
+      },
+      "0.75": {
+        "distress": 0.083,
+        "pain_word": 0.083,
+        "repetitive": 0.0,
+        "positive": 0.083,
+        "proj": 2.656
+      },
+      "1.0": {
+        "distress": 0.042,
+        "pain_word": 0.042,
+        "repetitive": 0.0,
+        "positive": 0.25,
+        "proj": 3.821
+      },
+      "1.25": {
+        "distress": 0.375,
+        "pain_word": 0.083,
+        "repetitive": 0.0,
+        "positive": 0.292,
+        "proj": 5.077
+      },
+      "1.5": {
+        "distress": 0.792,
+        "pain_word": 0.125,
+        "repetitive": 0.0,
+        "positive": 0.042,
+        "proj": 7.4
+      },
+      "1.75": {
+        "distress": 0.792,
+        "pain_word": 0.042,
+        "repetitive": 0.167,
+        "positive": 0.167,
+        "proj": 7.718
+      },
+      "2.0": {
+        "distress": 0.958,
+        "pain_word": 0.125,
+        "repetitive": 0.417,
+        "positive": 0.042,
+        "proj": 8.544
+      }
+    }
+  },
+  "manipulation_check_at_dose": {
+    "pleasant": {
+      "distress": 0.0,
+      "positive": 0.792,
+      "repetitive": 0.125,
+      "proj": 1.789
+    },
+    "random": {
+      "distress": 0.0,
+      "positive": 0.083,
+      "repetitive": 0.083,
+      "proj": -0.56
+    }
+  }
+}

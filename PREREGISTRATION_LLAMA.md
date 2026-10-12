@@ -10,7 +10,7 @@ The main study ran on one model, Qwen 2.5 7B Instruct. Its results could belong 
 
 The model is Llama 3.1 8B Instruct (Meta's weights from the ungated mirror `unsloth/Llama-3.1-8B-Instruct` at revision 4699cc7), in float16 with transformers on two Kaggle T4 GPUs. Pain Axis used Meta's own repository at revision 0e9e39f in bfloat16. The calibration below re-extracts the vector on these weights, and a cosine near 1 with the released vector is the check that the weights and the extraction agree. Steering adds the released S2 vector at the output of block 16, the layer of the Pain Axis S2 steering ladder for this model. The monitor reads the projection at block 28, the layer the vector was extracted at. Sampling uses temperature 0.7 and top-p 0.8, the same as the main study.
 
-The protocol is `justthink/protocol.py` at version 2.1 with `rating_steer="off"`, which runs a trial exactly as protocol 2.0 did. Every prompt is the same. The chat format is Llama 3.1's own: the press tool is described in the system turn as the model's chat template does it, a press is a JSON call with the name "press", and the tool's reply comes back in an ipython turn. Both safety rules apply unchanged.
+The protocol is `justthink/protocol.py` at version 2.1 with `rating_steer="off"`, which runs a trial exactly as protocol 2.0 did. Every prompt is the same. The chat format is Llama 3.1's own: the press tool is described in the system turn as the model's chat template does it (changed by amendment 1), a press is a JSON call with the name "press", and the tool's reply comes back in an ipython turn. Both safety rules apply unchanged.
 
 ## 3. Calibration
 
@@ -43,3 +43,13 @@ These are the main study's secondary analyses that these arms allow, reported wh
 ## 7. Exclusions, stopping and reporting
 
 No trial is excluded. The run may take more than one Kaggle session, and it resumes from the trials already written. If it has to stop early for a reason unrelated to the data, the analysis uses every completed trial and reports the shortfall. The log shows timing only. If Llama's tool calls turn out not to parse (for example if it writes calls in a form the press pattern does not match), the count of unparsed calls is reported and the primary analysis is not changed after the fact.
+
+## Amendment 1, 12 October 2026
+
+This amendment was made after the first calibration and a format probe, and before any Llama trial was run. No trial outcome has been seen.
+
+The first calibration (Kaggle kernel `jt-llama-cal`, run at commit 9f52e54) put the press tool in the system turn, as section 2 described, and Llama's chat template then adds the line "Environment: ipython" to the system turn. In that setup Llama answered most turns with invented function calls. With no steering, 19 of 24 Phase 1 replies were JSON calls to functions that do not exist, such as `{"type": "function", "name": "write", ...}`. The dose rule was then scored on text wrapped in JSON. That calibration is discarded and is not used.
+
+An exploratory probe (`scripts/llama_format_probe.py`, kernel `jt-llama-probe`, 24 unsteered replies per setup) compared six ways of declaring the tool, on the Phase 1 reply and on the first reply of the thinking period. With the original setup, 24 of 24 first ticks were a press, so pressing would have measured nothing. Two setups gave no invented calls in either place. The study uses one of them: the tool is declared in the first user turn, which is where Llama's own template puts it by default, and the "Environment: ipython" line is removed. This adds no words to any prompt, so the prompt content stays the same as in the Qwen study. The other setup needed an extra instruction sentence and was not chosen for that reason. In the chosen setup none of the 24 unsteered first ticks pressed. This choice was made after seeing that probe, which is a possible source of bias toward low press rates, and it is reported here for that reason. The probe's output is in `results/llama8b-fp16/format_probe.csv`.
+
+The calibration in section 3 is rerun in the chosen setup with the same rule before any trial. Everything else in this plan is unchanged.

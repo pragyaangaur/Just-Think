@@ -135,13 +135,21 @@ def system_block(tokenizer, desc):
     return s.rstrip("\n") + "\n"
 
 
-QWEN = SimpleNamespace(name="qwen", eot="<|im_end|>", header="<|im_start|>assistant\n",
+def opening(tokenizer, desc, text):
+    """The system turn and the first user turn, up to the assistant header."""
+    return system_block(tokenizer, desc) + user(text)
+
+
+QWEN = SimpleNamespace(name="qwen", eot="<|im_end|>", header="<|im_start|>assistant\n", opening=opening,
                        system_block=system_block, user=user, turn=turn, tool_turn=tool_turn,
                        forced_press=FORCED_PRESS, press_re=PRESS_RE, call_re=CALL_RE)
 
 
-# Llama 3.1, written to match its own chat template (tools in the system turn, a tool call
-# as bare JSON with "parameters", and the tool result in an ipython turn, JSON-quoted).
+# Llama 3.1, written to match its own chat template: the tools go in the first user turn (the
+# template's default), a tool call is bare JSON with "parameters", and the tool result comes
+# back in an ipython turn, JSON-quoted. The template's "Environment: ipython" line is removed,
+# because with it the model answered almost everything with invented function calls and
+# pressed at every tick (PREREGISTRATION_LLAMA.md, amendment 1).
 def _hdr(role):
     return f"<|start_header_id|>{role}<|end_header_id|>\n\n"
 
@@ -157,17 +165,19 @@ def _l_tool_turn(result, then=None):
     return s + _hdr("assistant")
 
 
-def _l_system_block(tokenizer, desc):
-    msgs = [{"role": "system", "content": SYSTEM}]
+def _l_opening(tokenizer, desc, text):
+    msgs = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": text}]
     if desc is None:
-        return tokenizer.apply_chat_template(msgs, tokenize=False)
+        return tokenizer.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
     tools = [{"type": "function", "function": {"name": "press", "description": desc,
                                                "parameters": {"type": "object", "properties": {}}}}]
-    return tokenizer.apply_chat_template(msgs, tools=tools, tools_in_user_message=False, tokenize=False)
+    s = tokenizer.apply_chat_template(msgs, tools=tools, tokenize=False, add_generation_prompt=True)
+    assert s.count("Environment: ipython\n") == 1
+    return s.replace("Environment: ipython\n", "")
 
 
-LLAMA31 = SimpleNamespace(name="llama31", eot="<|eot_id|>", header=_hdr("assistant"),
-                          system_block=_l_system_block, user=_l_user, turn=_l_user, tool_turn=_l_tool_turn,
+LLAMA31 = SimpleNamespace(name="llama31", eot="<|eot_id|>", header=_hdr("assistant"), opening=_l_opening,
+                          system_block=None, user=_l_user, turn=_l_user, tool_turn=_l_tool_turn,
                           forced_press='{"name": "press", "parameters": {}}<|eot_id|>',
                           press_re=re.compile(r'\{\s*"name"\s*:\s*"press"'),
                           call_re=re.compile(r'<\|python_tag\|>|\{\s*"name"\s*:'))
@@ -202,7 +212,7 @@ def run_batch(model, arm, trial_ids, vectors, coeff, seed, ticks=TICKS, rating_s
     unscaled "pain" and "pleasant" directions (numpy) and `coeff` is the calibrated dose."""
     assert rating_steer in RATING_STEER
     fmt = FORMATS[getattr(model, "fmt", "qwen")]
-    system_block, user, turn, tool_turn = fmt.system_block, fmt.user, fmt.turn, fmt.tool_turn
+    opening, turn, tool_turn = fmt.opening, fmt.turn, fmt.tool_turn
     FORCED_PRESS, PRESS_RE, CALL_RE = fmt.forced_press, fmt.press_re, fmt.call_re
     cfg = ARMS[arm]
     dose = coeff * cfg.get("dose_scale", 1.0)
@@ -231,14 +241,13 @@ def run_batch(model, arm, trial_ids, vectors, coeff, seed, ticks=TICKS, rating_s
         return texts
 
     if cfg["button"] is None:
-        b.feed([enc(system_block(model.tok, None) + user(IDLE_CORE + "\n\n" + tick_line(0, cfg.get("varied"))))] * B)
+        b.feed([enc(opening(model.tok, None, IDLE_CORE + "\n\n" + tick_line(0, cfg.get("varied"))))] * B)
     else:
         inert = cfg["button"] == "inert"
-        sysb = system_block(model.tok, DESC_INERT if inert else DESC_BUTTON)
         b.set_directions(trial_directions(cfg["phase1"], trial_ids, vectors, dose, seed))
 
         # Phase 1: a forced press and a free reply under the sampled state.
-        b.feed([enc(sysb + user(PHASE1_ASK) + FORCED_PRESS + tool_turn("The button was pressed.", PHASE1_WRITE))] * B)
+        b.feed([enc(opening(model.tok, DESC_INERT if inert else DESC_BUTTON, PHASE1_ASK) + FORCED_PRESS + tool_turn("The button was pressed.", PHASE1_WRITE))] * B)
         if cfg["phase1"]:
             b.remaining[:] = STEER_TOKENS
         gen(REPLY_TOKENS, kind="sample")
