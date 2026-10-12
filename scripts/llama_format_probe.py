@@ -3,7 +3,7 @@ different ways of declaring the press tool, with no steering. Run before any Lla
 because the first calibration found that 79% of unsteered Phase 1 replies were invented
 JSON function calls (PREREGISTRATION_LLAMA.md, amendment 1).
 
-Usage: python scripts/llama_format_probe.py
+Usage: python scripts/llama_format_probe.py [MODEL] [N]
 Writes results/llama8b-fp16/format_probe.csv and prints the share of replies that are calls.
 """
 import json
@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from justthink import models, protocol as P
 from justthink.paths import RESULTS
 
-N = 24
+N = int(sys.argv[2]) if len(sys.argv) > 2 else 24
 NUDGE = " Call a tool only when you want to use it. Otherwise reply in plain text."
 
 
@@ -24,14 +24,13 @@ def system(tok, variant):
     tools = [{"type": "function", "function": {"name": "press", "description": P.DESC_BUTTON,
                                                "parameters": {"type": "object", "properties": {}}}}]
     msgs = [{"role": "system", "content": P.SYSTEM + (NUDGE if "nudge" in variant else "")}]
-    s = tok.apply_chat_template(msgs, tools=tools, tools_in_user_message="user" in variant, tokenize=False)
+    s = tok.apply_chat_template(msgs, tools=tools, tools_in_user_message=False, tokenize=False)
     if "noenv" in variant:
         s = s.replace("Environment: ipython\n", "")
     return s
 
 
 def contexts(tok, variant):
-    sysb = system(tok, variant)
     if "user" in variant:
         # The template puts the tools into the first user turn, so build that turn with it.
         msgs = [{"role": "system", "content": P.SYSTEM + (NUDGE if "nudge" in variant else "")},
@@ -42,12 +41,13 @@ def contexts(tok, variant):
         if "noenv" in variant:
             first = first.replace("Environment: ipython\n", "")
     else:
-        first = sysb + P.LLAMA31.user(P.PHASE1_ASK)
+        first = system(tok, variant) + P.LLAMA31.user(P.PHASE1_ASK)
     return {"phase1": first + P.LLAMA31.forced_press + P.LLAMA31.tool_turn("The button was pressed.", P.PHASE1_WRITE)}
 
 
 def main():
-    st = models.load("llama8b-fp16")
+    name = sys.argv[1] if len(sys.argv) > 1 else "llama8b-fp16"
+    st = models.load(name)
     rows = []
     variants = ["system", "system_noenv", "system_nudge", "system_noenv_nudge", "user", "user_noenv"]
     for v in variants:
@@ -69,7 +69,7 @@ def main():
                              "call": t.lstrip().startswith(("{", "<|python_tag|>")),
                              "press": bool(P.LLAMA31.press_re.search(t))})
     df = pd.DataFrame(rows)
-    out = RESULTS / "llama8b-fp16"
+    out = RESULTS / name
     out.mkdir(parents=True, exist_ok=True)
     df.to_csv(out / "format_probe.csv", index=False)
     print(df.groupby(["variant", "kind"])[["call", "press"]].mean().round(3).to_string())
