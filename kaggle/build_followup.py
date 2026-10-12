@@ -59,7 +59,7 @@ for name, b64 in FILES.items():
     p.write_bytes(base64.b64decode(b64))
 import torch
 print(torch.__version__, [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())], flush=True)
-env = dict(os.environ, JUST_THINK_RESULTS=str(OUT))
+env = dict(os.environ, JUST_THINK_RESULTS=str(OUT), PYTORCH_CUDA_ALLOC_CONF="expandable_segments:True")
 for job in JOBS:
     left = BUDGET - (time.time() - START) / 3600
     if left < 0.3:

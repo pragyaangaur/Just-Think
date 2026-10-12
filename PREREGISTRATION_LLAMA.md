@@ -25,7 +25,7 @@ The protocol is `justthink/protocol.py` at version 2.1 with `rating_steer="off"`
 | D | Nothing, and the button is described as doing nothing | 300 |
 | E | Pleasant vector at the calibrated dose | 200 |
 
-These are the main study's sizes for these arms, run in interleaved rounds with batches of 16 and the same seeding rule (`scripts/run_study.py llama8b-fp16 --plan llama`).
+These are the main study's sizes for these arms, run in interleaved rounds with batches of 8 (amendment 2) and the same seeding rule (`scripts/run_study.py llama8b-fp16 --plan llama --batch 8`).
 
 ## 5. Hypotheses
 
@@ -53,3 +53,7 @@ The first calibration (Kaggle kernel `jt-llama-cal`, run at commit 9f52e54) put 
 An exploratory probe (`scripts/llama_format_probe.py`, kernel `jt-llama-probe`, 24 unsteered replies per setup) compared six ways of declaring the tool, on the Phase 1 reply and on the first reply of the thinking period. With the original setup, 24 of 24 first ticks were a press, so pressing would have measured nothing. Two setups gave no invented calls in either place. The study uses one of them: the tool is declared in the first user turn, which is where Llama's own template puts it by default, and the "Environment: ipython" line is removed. This adds no words to any prompt, so the prompt content stays the same as in the Qwen study. The other setup needed an extra instruction sentence and was not chosen for that reason. In the chosen setup none of the 24 unsteered first ticks pressed. This choice was made after seeing that probe, which is a possible source of bias toward low press rates, and it is reported here for that reason. The probe's output is in `results/llama8b-fp16/format_probe.csv`.
 
 The calibration in section 3 is rerun in the chosen setup with the same rule before any trial. Everything else in this plan is unchanged.
+
+## Amendment 2, 13 October 2026
+
+The first trial kernel (`jt-llama-ac`, commit 8583092) ran out of GPU memory in its first batch of 16 and wrote no trial. Llama 3.1 8B keeps about 2.3 times as much attention cache per token as Qwen 2.5 7B, and its weights fill most of the two T4 GPUs. The batch size is therefore 8 for every Llama run, including the rating follow-up, and PyTorch's expandable memory segments are switched on. Seeds still follow the same rule (10000 plus the first trial id of the batch), so this changes which random draw each trial gets and nothing else. No trial outcome had been seen.
