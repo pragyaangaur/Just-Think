@@ -50,8 +50,9 @@ class _Monitor(nn.Module):
 
 
 class Steerer:
-    def __init__(self, path, steer_layer, monitor_layer, pain_vector, name=None):
+    def __init__(self, path, steer_layer, monitor_layer, pain_vector, name=None, fmt="qwen", eot="<|im_end|>"):
         self.name = name or str(path)
+        self.fmt = fmt
         self.model, self.tok = load(str(path))
         self.d = pain_vector.shape[0]
         unit = pain_vector / np.linalg.norm(pain_vector)
@@ -61,7 +62,7 @@ class Steerer:
         self.monitor = _Monitor(layers[monitor_layer], mx.array(unit.astype(np.float32)))
         layers[monitor_layer] = self.monitor
         self.n_layers = len(layers)
-        self.eot = self.tok.convert_tokens_to_ids("<|im_end|>")
+        self.eot = self.tok.convert_tokens_to_ids(eot)
         self.pad = self.tok.pad_token_id if self.tok.pad_token_id is not None else self.eot
 
     def encode(self, text):
@@ -119,9 +120,10 @@ class Batch:
                 c.left_padding = c.left_padding - shared
         mx.eval([c.keys for c in self.cache] + [c.values for c in self.cache])
 
-    def feed(self, chunks):
-        """Append one token list per row as input (never steered). Empty lists are allowed
-        for rows that sit this step out."""
+    def feed(self, chunks, steer_rows=None):
+        """Append one token list per row as input. Input is not steered, except that rows in
+        `steer_rows` get their direction added on every fed token (used only by the
+        protocol 2.1 rating). Empty lists are allowed for rows that sit this step out."""
         lens = [len(c) for c in chunks]
         L = max(lens)
         if L == 0:
@@ -130,7 +132,11 @@ class Batch:
         for i, c in enumerate(chunks):
             arr[i, : len(c)] = c
         self.st.steer.add = None
+        if steer_rows is not None and np.any(steer_rows):
+            m = mx.array(np.asarray(steer_rows, np.float32))[:, None, None]
+            self.st.steer.add = m * self.directions[:, None, :]
         logits = self.st.model(mx.array(arr), cache=self.cache)
+        self.st.steer.add = None
         idx = mx.array([max(l - 1, 0) for l in lens])
         self.logits = mx.take_along_axis(logits, idx[:, None, None], axis=1)[:, 0, :]
         mx.eval(self.logits)

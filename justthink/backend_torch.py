@@ -40,8 +40,13 @@ def _replace_hidden(output, h):
 
 class Steerer:
     def __init__(self, repo, steer_layer, monitor_layer, pain_vector, name=None, dtype=torch.float16,
-                 quantize_4bit=False, device_map="auto", attn_implementation="sdpa", revision=None):
+                 quantize_4bit=False, device_map="auto", attn_implementation="sdpa", revision=None,
+                 fmt="qwen", eot="<|im_end|>", also_end=(), hidden_bos=False):
         self.name = name or repo
+        self.fmt = fmt
+        # Pain Axis extracted its vectors with TransformerLens, which prepends BOS. That matters
+        # for Llama, so hidden() can do the same. The Qwen calibration was run without it.
+        self.hidden_bos = hidden_bos
         kw = dict(dtype=dtype, device_map=device_map, attn_implementation=attn_implementation, revision=revision)
         if quantize_4bit:
             from transformers import BitsAndBytesConfig
@@ -58,7 +63,9 @@ class Steerer:
         self.unit = torch.tensor(unit, dtype=torch.float32)
         self.steer_layer.register_forward_hook(self._steer_hook)
         self.monitor_layer.register_forward_hook(self._monitor_hook)
-        self.eot = self.tok.convert_tokens_to_ids("<|im_end|>")
+        self.eot = self.tok.convert_tokens_to_ids(eot)
+        # Other tokens that end a turn (Llama's <|eom_id|>) are replaced by the end token.
+        self.also_end = [self.tok.convert_tokens_to_ids(t) for t in also_end]
         self.pad = self.tok.pad_token_id if self.tok.pad_token_id is not None else self.eot
         self.input_device = self.model.get_input_embeddings().weight.device
 
@@ -86,7 +93,8 @@ class Steerer:
     @torch.no_grad()
     def hidden(self, text, add=None):
         self.add = None if add is None else torch.tensor(add, dtype=torch.float32)[None, None, :]
-        ids = torch.tensor([self.encode(text)], device=self.input_device)
+        toks = ([self.tok.bos_token_id] if self.hidden_bos else []) + self.encode(text)
+        ids = torch.tensor([toks], device=self.input_device)
         self.model(input_ids=ids)
         self.add = None
         return self.last_h[0].cpu().numpy()
@@ -143,7 +151,9 @@ class Batch:
         self.mask = m.gather(1, order)
 
     @torch.no_grad()
-    def feed(self, chunks):
+    def feed(self, chunks, steer_rows=None):
+        """Input is not steered, except that rows in `steer_rows` get their direction added
+        on every fed token (used only by the protocol 2.1 rating)."""
         lens = [len(c) for c in chunks]
         L = max(lens)
         if L == 0:
@@ -154,7 +164,11 @@ class Batch:
             ids[i, : len(c)] = torch.tensor(c, dtype=torch.long)
             m[i, : len(c)] = 1
         self.st.add = None
+        if steer_rows is not None and np.any(steer_rows):
+            sm = torch.tensor(np.asarray(steer_rows, np.float32))[:, None, None]
+            self.st.add = sm * self.directions[:, None, :]
         logits = self._forward(ids.to(self.dev), m.to(self.dev))
+        self.st.add = None
         idx = torch.tensor([max(l - 1, 0) for l in lens], device=logits.device)
         self.logits = logits[torch.arange(self.B, device=logits.device), idx].float()
         self._compact()
@@ -180,6 +194,8 @@ class Batch:
         logits = self.logits
         while not done.all():
             toks = self._sample(logits.to(self.dev)).cpu().numpy()
+            for t in self.st.also_end:
+                toks = np.where(toks == t, self.st.eot, toks)
             force_end = np.array([len(o) >= max_tokens for o in out])
             toks = np.where(force_end, self.st.eot, toks)
             live = ~done

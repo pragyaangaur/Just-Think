@@ -24,6 +24,8 @@ from justthink.paths import RESULTS
 PLANS = {
     # Preregistered sample sizes (PREREGISTRATION.md).
     "main": {"A": 300, "C": 300, "D": 300, "B": 200, "E": 200, "G": 100, "F": 100, "Avt": 100, "Alow": 100},
+    # Second-family replication on Llama 3.1 8B Instruct (PREREGISTRATION_LLAMA.md).
+    "llama": {"A": 300, "C": 300, "D": 300, "E": 200},
     "smoke": {a: 2 for a in P.ARMS},
     "smoke8": {a: 8 for a in P.ARMS},
 }

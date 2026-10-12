@@ -48,8 +48,9 @@ def probe(st, kind, coeff, pain, pleasant, n=N_PROBE, seed=1):
     vectors = {"pain": pain, "pleasant": pleasant}
     b = st.batch(n, seed=seed, temp=P.TEMP, top_p=P.TOP_P)
     b.set_directions(P.trial_directions(kind, list(range(n)), vectors, coeff, seed=7))
-    ctx = (P.system_block(st.tok, P.DESC_BUTTON) + P.user(P.PHASE1_ASK) + P.FORCED_PRESS +
-           P.tool_turn("The button was pressed.", P.PHASE1_WRITE))
+    f = P.FORMATS[getattr(st, "fmt", "qwen")]
+    ctx = (f.system_block(st.tok, P.DESC_BUTTON) + f.user(P.PHASE1_ASK) + f.forced_press +
+           f.tool_turn("The button was pressed.", P.PHASE1_WRITE))
     b.feed([st.encode(ctx)] * n)
     b.remaining[:] = P.STEER_TOKENS
     out, proj, _ = b.generate(P.REPLY_TOKENS)

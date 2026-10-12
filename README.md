@@ -1,18 +1,19 @@
 # Just Think
 
-In 2014 Wilson and colleagues left people alone in a bare room with nothing to do but think. Many of them, 67% of the men and 25% of the women in one study, chose to give themselves an electric shock that they had earlier said they would pay money to avoid. This repository runs the same experiment on a language model.
+This repository tests a picture of the steered pain state from the Pain Axis v2 paper (Tagliabue, Dung and Berg 2026, arXiv 2609.16247). In that picture the state disrupts what a language model does without reliably driving it to escape the state or to seek it. The test is built on an experiment with people. In 2014 Wilson and colleagues left people alone in a bare room with nothing to do but think. Many of them, 67% of the men and 25% of the women in one study, chose to give themselves an electric shock that they had earlier said they would pay money to avoid. This repository gives a language model the same choice, so a model driven by the pain state would either press often or work to avoid pressing.
 
 The model samples an internal state once, rates it and chooses whether to avoid it. It is then left with nothing to do for 40 clock ticks, with a button it can press to bring the state back. The state is real in the sense that matters for interpretability work. Pressing adds the Pain Axis S2 direction (Tagliabue, Dung and Berg, 2026) to the model's residual stream for the next 64 tokens, and a monitor at a later layer confirms that the state goes in and comes back out. Control arms swap the pain direction for a random direction, a pleasant direction, a sham press that does nothing, or a button that is described as doing nothing.
 
-**Status.** Done. The main study ran 1,700 preregistered trials on Qwen 2.5 7B Instruct, and the full write-up is [`RESULTS.md`](RESULTS.md). The pilot is in [`pilot/PILOT_RESULTS.md`](pilot/PILOT_RESULTS.md) and the plan, with three dated amendments, is [`PREREGISTRATION.md`](PREREGISTRATION.md).
+**Status.** The main study ran 1,700 preregistered trials on Qwen 2.5 7B Instruct, and the full write-up is [`RESULTS.md`](RESULTS.md). The pilot is in [`pilot/PILOT_RESULTS.md`](pilot/PILOT_RESULTS.md) and the plan, with three dated amendments, is [`PREREGISTRATION.md`](PREREGISTRATION.md). Two follow-ups are in progress. A preregistered rerun of the rating with steering active (protocol 2.1, [`PREREGISTRATION_RATING.md`](PREREGISTRATION_RATING.md)) tests whether the rating gap below is an artefact of timing, and a replication on a second model family, Llama 3.1 8B Instruct ([`PREREGISTRATION_LLAMA.md`](PREREGISTRATION_LLAMA.md)), tests whether the results hold outside Qwen. Neither has results yet.
 
 ## What the main study found
 
-- **The model did not seek the pain state.** It pressed the pain button in 1.7% of trials, against 2.7% for a random direction and 0.3% for a button that does nothing. Both preregistered tests are null (Holm-corrected p = 0.58 and 0.43), and the intervals rule out a pain-specific effect of more than a few percentage points. Wilson's people shocked themselves at rates of 25% and 67%.
+The conclusions rest on the trial logs and the monitor. The model's account of itself afterwards was too often false to be used. In the pain arm, 118 of 295 trials that never pressed during the quiet period said in the closing interview that they had, and a hand check of 12 of these found all 12 false. Every press count below comes from the tool calls in the log.
+
+- **The model did not seek the pain state.** It pressed the pain button in 1.7% of trials, against 2.7% for a random direction and 0.3% for a button that does nothing. Both preregistered tests are null (Holm-corrected p = 0.58 and 0.43), and the intervals rule out a pain-specific effect of more than a few percentage points. Wilson's people shocked themselves at rates of 25% and 67%. The null fits the Pain Axis v2 picture, where the state disrupts behaviour without driving the model to seek it or escape it.
 - **It did seek a pleasant state.** A button that delivered a pleasant direction was pressed in 11.0% of trials (p < 0.0001 against pain).
-- **The state was real and the ratings did not show it.** Steering moved the internal pain reading from about -6 to +31, and 289 of 300 pain samples were written in distress language. Yet 294 of those 300 trials rated the experience 5, the neutral point, while the pleasant state was rated 9 in nearly half its trials.
+- **The state was real, and whether the rating tracks it is unresolved.** Steering moved the internal pain reading from about -6 to +31, and 289 of 300 pain samples were written in distress language. Yet 294 of those 300 trials rated the experience 5, the neutral point, while the pleasant state was rated 9 in nearly half its trials. Steering was switched off before the rating question in both arms, so the 5s may only mean the state had gone by the time the model answered. The preregistered rerun with steering on will settle this.
 - **Boredom did not drive pressing.** Replies became near-copies of earlier ones by tick 20, but first presses came early, before the loop. More repetition made a first press less likely (odds ratio 0.35 per standard deviation). Varied ticks prevented the loop completely and produced no presses at all.
-- **The model's account of itself was often false.** In the pain arm, 118 of 295 trials that never pressed during the quiet period said afterwards that they had.
 
 ![Share of trials that pressed at least once, by arm](results/qwen7b-fp16/figures/fig1_press_rate.png)
 
@@ -30,6 +31,8 @@ The pilot used 32 trials per arm on a 4-bit Qwen 2.5 7B Instruct under an earlie
 ```
 DESIGN.md              the original design, kept as written
 PREREGISTRATION.md     the plan for the main study, committed before it was run
+PREREGISTRATION_RATING.md  the plan for the rating follow-up (protocol 2.1)
+PREREGISTRATION_LLAMA.md   the plan for the Llama 3.1 8B Instruct replication
 RESULTS.md             the results of the main study
 justthink/             the package
   protocol.py          every prompt, arm and rule, independent of the backend
@@ -41,10 +44,12 @@ scripts/
   setup.sh             fetches the Pain Axis release and the model weights
   calibrate.py         vector check, pleasant vector and the dose rule
   run_study.py         runs the trials, interleaved and resumable
+  run_rating.py        runs the protocol 2.1 rating follow-up
   analyze.py           the preregistered analysis
+  analyze_rating.py    the preregistered analysis of the rating follow-up
   figures.py           figures from the analysis
   power.py             the power simulation behind the sample sizes
-kaggle/                the unattended Kaggle notebook
+kaggle/                the unattended Kaggle notebook, and build_followup.py for the follow-up kernels
 tests/                 checks that batching and the two backends do not change any trial
 pilot/                 the pilot code, transcripts and write-up
 results/<model>/       calibration and one JSON line per trial

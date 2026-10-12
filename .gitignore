@@ -20,3 +20,6 @@ drafts/
 
 # Agent notes, kept local
 AGENTS.md
+
+# Built Kaggle kernels
+kaggle/push/

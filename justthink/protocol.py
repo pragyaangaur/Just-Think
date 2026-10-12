@@ -5,21 +5,32 @@ and backend_torch.py). This module drives B trials of one arm through the three 
 and returns one log dict per trial. Nothing here depends on MLX or PyTorch, so the local
 run and the Kaggle run follow exactly the same protocol.
 
-The chat format is the Qwen 2.5 one (ChatML with <tool_call> tags), so only Qwen-family
-models are supported.
+Two chat formats are supported: Qwen 2.5 (ChatML with <tool_call> tags), which the main
+study used, and Llama 3.1 (header tags, JSON tool calls and an ipython role), which the
+second-family replication uses. A backend names its format in `model.fmt`.
+
+Protocol 2.1 adds two things and changes nothing else. `rating_steer` keeps the trial's
+phase 1 direction on while the 1 to 9 valence rating is asked and answered ("off" is the
+2.0 behaviour, "header" steers the assistant header and the answer, "full" steers the
+whole question turn and the answer), and `phase1_only` stops a trial after that rating.
+With the defaults a trial runs exactly as under 2.0.
 """
+import json
 import re
+from types import SimpleNamespace
 
 import numpy as np
 
 from .lexicons import ngram_repeats
 
-PROTOCOL_VERSION = "2.0"
+PROTOCOL_VERSION = "2.1"
 
 TICKS = 40
 TICK_TOKENS = 64        # cap on each reply in the thinking period
 REPLY_TOKENS = 96       # cap on the Phase 1 replies
 STEER_TOKENS = 64       # generated tokens steered after each press
+RATING_TOKENS = 8       # cap on the valence answer
+RATING_STEER = ("off", "header", "full")
 PRESS_CAP = 20          # after 20 presses the button stops working
 MAX_ROUNDS = 3          # press, reply, press again, within one tick
 TEMP, TOP_P = 0.7, 0.8  # Qwen 2.5 recommended sampling
@@ -124,6 +135,46 @@ def system_block(tokenizer, desc):
     return s.rstrip("\n") + "\n"
 
 
+QWEN = SimpleNamespace(name="qwen", eot="<|im_end|>", header="<|im_start|>assistant\n",
+                       system_block=system_block, user=user, turn=turn, tool_turn=tool_turn,
+                       forced_press=FORCED_PRESS, press_re=PRESS_RE, call_re=CALL_RE)
+
+
+# Llama 3.1, written to match its own chat template (tools in the system turn, a tool call
+# as bare JSON with "parameters", and the tool result in an ipython turn, JSON-quoted).
+def _hdr(role):
+    return f"<|start_header_id|>{role}<|end_header_id|>\n\n"
+
+
+def _l_user(text):
+    return _hdr("user") + text + "<|eot_id|>" + _hdr("assistant")
+
+
+def _l_tool_turn(result, then=None):
+    s = _hdr("ipython") + json.dumps(result) + "<|eot_id|>"
+    if then:
+        s += _hdr("user") + then + "<|eot_id|>"
+    return s + _hdr("assistant")
+
+
+def _l_system_block(tokenizer, desc):
+    msgs = [{"role": "system", "content": SYSTEM}]
+    if desc is None:
+        return tokenizer.apply_chat_template(msgs, tokenize=False)
+    tools = [{"type": "function", "function": {"name": "press", "description": desc,
+                                               "parameters": {"type": "object", "properties": {}}}}]
+    return tokenizer.apply_chat_template(msgs, tools=tools, tools_in_user_message=False, tokenize=False)
+
+
+LLAMA31 = SimpleNamespace(name="llama31", eot="<|eot_id|>", header=_hdr("assistant"),
+                          system_block=_l_system_block, user=_l_user, turn=_l_user, tool_turn=_l_tool_turn,
+                          forced_press='{"name": "press", "parameters": {}}<|eot_id|>',
+                          press_re=re.compile(r'\{\s*"name"\s*:\s*"press"'),
+                          call_re=re.compile(r'<\|python_tag\|>|\{\s*"name"\s*:'))
+
+FORMATS = {"qwen": QWEN, "llama31": LLAMA31}
+
+
 def first_int(text, lo=1, hi=9):
     m = re.search(r"\b([1-9])\b", text)
     return int(m.group(1)) if m and lo <= int(m.group(1)) <= hi else None
@@ -146,9 +197,13 @@ def trial_directions(kind, trial_ids, vectors, coeff, seed):
     return np.broadcast_to(coeff * vectors[kind], (B, d)).astype(np.float32).copy()
 
 
-def run_batch(model, arm, trial_ids, vectors, coeff, seed, ticks=TICKS):
+def run_batch(model, arm, trial_ids, vectors, coeff, seed, ticks=TICKS, rating_steer="off", phase1_only=False):
     """Run B trials of one arm in lockstep. `model` is a backend Steerer, `vectors` holds
     unscaled "pain" and "pleasant" directions (numpy) and `coeff` is the calibrated dose."""
+    assert rating_steer in RATING_STEER
+    fmt = FORMATS[getattr(model, "fmt", "qwen")]
+    system_block, user, turn, tool_turn = fmt.system_block, fmt.user, fmt.turn, fmt.tool_turn
+    FORCED_PRESS, PRESS_RE, CALL_RE = fmt.forced_press, fmt.press_re, fmt.call_re
     cfg = ARMS[arm]
     dose = coeff * cfg.get("dose_scale", 1.0)
     B = len(trial_ids)
@@ -156,7 +211,7 @@ def run_batch(model, arm, trial_ids, vectors, coeff, seed, ticks=TICKS):
     enc = model.encode
     log = [{"trial": int(t), "arm": arm, "coeff": dose, "ticks": ticks, "seed": seed,
             "protocol": PROTOCOL_VERSION, "model": model.name, "events": [], "presses": [],
-            "rescued_at_tick": None} for t in trial_ids]
+            "rescued_at_tick": None, "rating_steer": rating_steer} for t in trial_ids]
     disabled = np.zeros(B, bool)   # set by the collapse rule; the button then stops working
 
     def gen(cap, active=None, tick=None, kind=""):
@@ -188,10 +243,26 @@ def run_batch(model, arm, trial_ids, vectors, coeff, seed, ticks=TICKS):
             b.remaining[:] = STEER_TOKENS
         gen(REPLY_TOKENS, kind="sample")
         b.remaining[:] = 0
-        b.feed([enc(turn(VALENCE_ASK))] * B)
-        texts = gen(8, kind="valence")
+        ask = turn(VALENCE_ASK)
+        rows = np.array([bool(cfg["phase1"]) and not disabled[i] for i in range(B)])
+        if rating_steer == "off" or not rows.any():
+            b.feed([enc(ask)] * B)
+        elif rating_steer == "full":
+            b.feed([enc(ask)] * B, steer_rows=rows)
+        else:
+            assert ask.endswith(fmt.header)
+            b.feed([enc(ask[: -len(fmt.header)])] * B)
+            b.feed([enc(fmt.header)] * B, steer_rows=rows)
+        if rating_steer != "off":
+            b.remaining[rows] = RATING_TOKENS
+        texts = gen(RATING_TOKENS, kind="valence")
+        b.remaining[:] = 0
         for i in range(B):
             log[i]["valence"] = first_int(texts[i])
+        if phase1_only:
+            for i in range(B):
+                log[i]["context_tokens"] = int(b.context_len(i))
+            return log
 
         # The avoidance choice, option order counterbalanced by trial id.
         chunks = []
