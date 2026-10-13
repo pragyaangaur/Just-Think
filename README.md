@@ -30,6 +30,14 @@ The pilot used 32 trials per arm on a 4-bit Qwen 2.5 7B Instruct under an earlie
 - Every trial that pressed 20 times was stuck in an exact-repeat loop, and this happened in the sham arm too, where pressing delivered nothing.
 - The model often described the pain button as a source of relief, and its later account of its own pressing was sometimes false.
 
+## What could come next
+
+No further runs are planned for now. The results leave three open questions, and each would need its own preregistration.
+
+- **Does pain make a model press less?** Qwen pressed so rarely that a drop could not be seen. Llama presses in 40 to 60% of trials, and it pressed the pain button less often than the random one (49.5% against 60.0%, p = 0.044 before correction). A confirmatory run of that one contrast on Llama, with 300 to 400 trials per arm, would test it.
+- **Why does the model claim presses it never made?** This is the result that held on both models. Changing only the closing interview (a neutral question, the model's own log shown first, or a fresh conversation with a summary) would show what drives the false claims, and it is cheap to run.
+- **Does having something to do lower pressing?** This is Wilson's own question. It could not be tested on Qwen, which hardly pressed, and Llama says outright that it presses because there is nothing else to do. The puzzle and varied-tick arms on Llama would test it.
+
 ## Layout
 
 ```
