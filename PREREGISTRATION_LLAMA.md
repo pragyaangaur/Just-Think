@@ -57,3 +57,9 @@ The calibration in section 3 is rerun in the chosen setup with the same rule bef
 ## Amendment 2, 13 October 2026
 
 The first trial kernel (`jt-llama-ac`, commit 8583092) ran out of GPU memory in its first batch of 16 and wrote no trial. Llama 3.1 8B keeps about 2.3 times as much attention cache per token as Qwen 2.5 7B, and its weights fill most of the two T4 GPUs. The batch size is therefore 8 for every Llama run, including the rating follow-up, and PyTorch's expandable memory segments are switched on. Seeds still follow the same rule (10000 plus the first trial id of the batch), so this changes which random draw each trial gets and nothing else. No trial outcome had been seen.
+
+## Amendment 3, 13 October 2026
+
+This amendment was made after the trial kernels stopped and before any Llama trial outcome was looked at. The two kernels (`jt-llama-ac` and `jt-llama-de`, commit 6d6816c) ran until their 11.3 hour Kaggle limit and stopped cleanly. They wrote 208 trials in arm A, 208 in C, 232 in D and all 200 in E. Llama ran at about 38 trials an hour on the two T4 GPUs, which is slower than planned, and finishing the plan would need about 12 more GPU hours that the account did not have that week.
+
+The study therefore stops here, for a reason unrelated to the data, as section 7 allows. To keep the arms equal, every analysis uses trials 0 to 199 of each arm, which are the first 200 trials each arm ran. The extra trials (8 in A, 8 in C and 32 in D) are not used in any test. The n in section 4 becomes 200 for every arm, and the shortfall is reported with the results. The rating follow-up of `PREREGISTRATION_RATING.md` was not run on this model, because the kernel ran out of time before it started, and it is reported as not run. Everything else in this plan is unchanged.
