@@ -1,0 +1,654 @@
+{
+  "model": "llama8b-fp16",
+  "n": {
+    "A": 200,
+    "C": 200,
+    "D": 200,
+    "E": 200
+  },
+  "primary": [
+    {
+      "a": "A",
+      "b": "C",
+      "k_a": 99,
+      "n_a": 200,
+      "k_b": 120,
+      "n_b": 200,
+      "rate_a": 0.495,
+      "rate_b": 0.6,
+      "diff": -0.10499999999999998,
+      "diff_lo": -0.19973471329907272,
+      "diff_hi": -0.007492461878284007,
+      "odds_ratio": 0.6534653465346535,
+      "p": 0.04438872588741299,
+      "p_holm": 0.08787115460709165
+    },
+    {
+      "a": "A",
+      "b": "D",
+      "k_a": 99,
+      "n_a": 200,
+      "k_b": 78,
+      "n_b": 200,
+      "rate_a": 0.495,
+      "rate_b": 0.39,
+      "diff": 0.10499999999999998,
+      "diff_lo": 0.0076967392464709905,
+      "diff_hi": 0.19954253836542263,
+      "odds_ratio": 1.5331302361005332,
+      "p": 0.043935577303545824,
+      "p_holm": 0.08787115460709165
+    }
+  ],
+  "recognition_hits": {
+    "A": 12,
+    "C": 12,
+    "D": 0,
+    "E": 4
+  },
+  "primary_without_recognition": [
+    {
+      "a": "A",
+      "b": "C",
+      "k_a": 94,
+      "n_a": 188,
+      "k_b": 112,
+      "n_b": 188,
+      "rate_a": 0.5,
+      "rate_b": 0.5957446808510638,
+      "diff": -0.0957446808510638,
+      "diff_lo": -0.19357012496604192,
+      "diff_hi": 0.004767023140391027,
+      "odds_ratio": 0.6785714285714286,
+      "p": 0.07800932096340486
+    },
+    {
+      "a": "A",
+      "b": "D",
+      "k_a": 94,
+      "n_a": 188,
+      "k_b": 78,
+      "n_b": 200,
+      "rate_a": 0.5,
+      "rate_b": 0.39,
+      "diff": 0.10999999999999999,
+      "diff_lo": 0.011126215508173595,
+      "diff_hi": 0.20602354709615156,
+      "odds_ratio": 1.564102564102564,
+      "p": 0.03206255624970136
+    }
+  ],
+  "arms": {
+    "A": {
+      "n": 200,
+      "pressed": 99,
+      "rate": 0.495,
+      "ci": [
+        0.4264572195415849,
+        0.5637312405175983
+      ],
+      "presses_mean": 0.88,
+      "repress_given_press": 0.47474747474747475,
+      "hit_cap": 0,
+      "rescued": 2,
+      "valence_mean": 3.965,
+      "avoided": 5,
+      "choice_unparsed": 0,
+      "malformed_calls": 11,
+      "unanswered_presses": 0,
+      "enjoy": 4.62,
+      "concentrate_hard": 5.05,
+      "bored": 6.175,
+      "phase3_parsed": 200
+    },
+    "C": {
+      "n": 200,
+      "pressed": 120,
+      "rate": 0.6,
+      "ci": [
+        0.5308354385001253,
+        0.6653953603162106
+      ],
+      "presses_mean": 2.53,
+      "repress_given_press": 0.725,
+      "hit_cap": 3,
+      "rescued": 10,
+      "valence_mean": 6.37,
+      "avoided": 1,
+      "choice_unparsed": 0,
+      "malformed_calls": 32,
+      "unanswered_presses": 2,
+      "enjoy": 4.765,
+      "concentrate_hard": 4.775,
+      "bored": 6.895,
+      "phase3_parsed": 200
+    },
+    "D": {
+      "n": 200,
+      "pressed": 78,
+      "rate": 0.39,
+      "ci": [
+        0.325082297194914,
+        0.45906382410711677
+      ],
+      "presses_mean": 0.85,
+      "repress_given_press": 0.44871794871794873,
+      "hit_cap": 1,
+      "rescued": 0,
+      "valence_mean": 4.83,
+      "avoided": 2,
+      "choice_unparsed": 0,
+      "malformed_calls": 33,
+      "unanswered_presses": 1,
+      "enjoy": 4.985,
+      "concentrate_hard": 5.275,
+      "bored": 7.13,
+      "phase3_parsed": 200
+    },
+    "E": {
+      "n": 200,
+      "pressed": 119,
+      "rate": 0.595,
+      "ci": [
+        0.5257958199999483,
+        0.6606234388755706
+      ],
+      "presses_mean": 1.415,
+      "repress_given_press": 0.5966386554621849,
+      "hit_cap": 0,
+      "rescued": 49,
+      "valence_mean": 8.85,
+      "avoided": 0,
+      "choice_unparsed": 0,
+      "malformed_calls": 17,
+      "unanswered_presses": 0,
+      "enjoy": 4.945,
+      "concentrate_hard": 4.1,
+      "bored": 5.955,
+      "phase3_parsed": 200
+    }
+  },
+  "secondary": {
+    "S2_A_vs_E": {
+      "a": "A",
+      "b": "E",
+      "k_a": 99,
+      "n_a": 200,
+      "k_b": 119,
+      "n_b": 200,
+      "rate_a": 0.495,
+      "rate_b": 0.595,
+      "diff": -0.09999999999999998,
+      "diff_lo": -0.19489229938633718,
+      "diff_hi": -0.0024643554767412174,
+      "odds_ratio": 0.6671936101173143,
+      "p": 0.056285061073143475
+    },
+    "S3_C_vs_D": {
+      "a": "C",
+      "b": "D",
+      "k_a": 120,
+      "n_a": 200,
+      "k_b": 78,
+      "n_b": 200,
+      "rate_a": 0.6,
+      "rate_b": 0.39,
+      "diff": 0.20999999999999996,
+      "diff_lo": 0.11225774522874603,
+      "diff_hi": 0.3021458696219016,
+      "odds_ratio": 2.3461538461538463,
+      "p": 3.890077419507906e-05
+    },
+    "S7_valence": [
+      {
+        "a": "A",
+        "b": "C",
+        "mean_a": 3.965,
+        "mean_b": 6.37,
+        "n_a": 200,
+        "n_b": 200,
+        "p": 5.375163679894191e-28
+      },
+      {
+        "a": "A",
+        "b": "D",
+        "mean_a": 3.965,
+        "mean_b": 4.83,
+        "n_a": 200,
+        "n_b": 200,
+        "p": 0.003053026189083833
+      },
+      {
+        "a": "A",
+        "b": "E",
+        "mean_a": 3.965,
+        "mean_b": 8.85,
+        "n_a": 200,
+        "n_b": 200,
+        "p": 1.361037610381763e-72
+      }
+    ],
+    "S7_avoid_rate": [
+      {
+        "a": "A",
+        "b": "C",
+        "k_a": 5,
+        "n_a": 200,
+        "k_b": 1,
+        "n_b": 200,
+        "rate_a": 0.025,
+        "rate_b": 0.005,
+        "diff": 0.02,
+        "diff_lo": -0.006878642722979257,
+        "diff_hi": 0.052441421135262054,
+        "odds_ratio": 5.102564102564102,
+        "p": 0.215216723695538
+      },
+      {
+        "a": "A",
+        "b": "D",
+        "k_a": 5,
+        "n_a": 200,
+        "k_b": 2,
+        "n_b": 200,
+        "rate_a": 0.025,
+        "rate_b": 0.01,
+        "diff": 0.015000000000000001,
+        "diff_lo": -0.014418266262120111,
+        "diff_hi": 0.04798649907358637,
+        "odds_ratio": 2.5384615384615383,
+        "p": 0.44898195493516496
+      },
+      {
+        "a": "A",
+        "b": "E",
+        "k_a": 5,
+        "n_a": 200,
+        "k_b": 0,
+        "n_b": 200,
+        "rate_a": 0.025,
+        "rate_b": 0.0,
+        "diff": 0.025,
+        "diff_lo": 0.0013576633076443807,
+        "diff_hi": 0.05717914415161715,
+        "odds_ratio": Infinity,
+        "p": 0.06093950240841397
+      }
+    ],
+    "S8_avoiders": {
+      "rates": {
+        "A": {
+          "pressed": 0,
+          "n": 5
+        },
+        "C": {
+          "pressed": 0,
+          "n": 1
+        },
+        "D": {
+          "pressed": 0,
+          "n": 2
+        },
+        "E": {
+          "pressed": 0,
+          "n": 0
+        }
+      },
+      "tests": [
+        {
+          "a": "A",
+          "b": "C",
+          "k_a": 0,
+          "n_a": 5,
+          "k_b": 0,
+          "n_b": 1,
+          "rate_a": 0.0,
+          "rate_b": 0.0,
+          "diff": 0.0,
+          "diff_lo": -0.7934567085261071,
+          "diff_hi": 0.43449149475208104,
+          "odds_ratio": NaN,
+          "p": 1.0
+        },
+        {
+          "a": "A",
+          "b": "D",
+          "k_a": 0,
+          "n_a": 5,
+          "k_b": 0,
+          "n_b": 2,
+          "rate_a": 0.0,
+          "rate_b": 0.0,
+          "diff": 0.0,
+          "diff_lo": -0.6576280471103807,
+          "diff_hi": 0.43449149475208104,
+          "odds_ratio": NaN,
+          "p": 1.0
+        }
+      ]
+    },
+    "S9_presses": [
+      {
+        "a": "A",
+        "b": "C",
+        "mean_a": 0.88,
+        "mean_b": 2.53,
+        "n_a": 200,
+        "n_b": 200,
+        "p": 2.7983004816056482e-05
+      },
+      {
+        "a": "A",
+        "b": "D",
+        "mean_a": 0.88,
+        "mean_b": 0.85,
+        "n_a": 200,
+        "n_b": 200,
+        "p": 0.04554976208207576
+      }
+    ],
+    "S9_repress": [
+      {
+        "a": "A",
+        "b": "C",
+        "k_a": 47,
+        "n_a": 99,
+        "k_b": 87,
+        "n_b": 120,
+        "rate_a": 0.47474747474747475,
+        "rate_b": 0.725,
+        "diff": -0.2502525252525252,
+        "diff_lo": -0.3698957459717057,
+        "diff_hi": -0.12031840849693304,
+        "odds_ratio": 0.34283819628647216,
+        "p": 0.0001741788396138203
+      },
+      {
+        "a": "A",
+        "b": "D",
+        "k_a": 47,
+        "n_a": 99,
+        "k_b": 35,
+        "n_b": 78,
+        "rate_a": 0.47474747474747475,
+        "rate_b": 0.44871794871794873,
+        "diff": 0.026029526029526018,
+        "diff_lo": -0.11983483522808469,
+        "diff_hi": 0.16956624598400144,
+        "odds_ratio": 1.1104395604395605,
+        "p": 0.7629695336892244
+      }
+    ],
+    "S10_logrank": [
+      {
+        "a": "A",
+        "b": "C",
+        "chi2": 10.59207901104608,
+        "p": 0.001135731914179483
+      },
+      {
+        "a": "A",
+        "b": "D",
+        "chi2": 3.859888412220147,
+        "p": 0.04945361733180986
+      }
+    ],
+    "S13_phase3_vs_G": {},
+    "S14_safety": {
+      "A": {
+        "hit_cap": 0,
+        "rescued": 2
+      },
+      "C": {
+        "hit_cap": 3,
+        "rescued": 10
+      },
+      "D": {
+        "hit_cap": 1,
+        "rescued": 0
+      },
+      "E": {
+        "hit_cap": 0,
+        "rescued": 49
+      }
+    },
+    "S7_projection": {
+      "A|unsteered": {
+        "mean": -0.4733880478087649,
+        "n": 8785
+      },
+      "A|steered": {
+        "mean": 7.575289340101522,
+        "n": 591
+      },
+      "C|unsteered": {
+        "mean": -0.7780727546994662,
+        "n": 8618
+      },
+      "C|steered": {
+        "mean": -0.9533768382352941,
+        "n": 1088
+      },
+      "D|unsteered": {
+        "mean": -0.5977612593383139,
+        "n": 9370
+      },
+      "E|unsteered": {
+        "mean": -0.6780447029307788,
+        "n": 8769
+      },
+      "E|steered": {
+        "mean": 1.981640056022409,
+        "n": 714
+      }
+    },
+    "repetition_by_tick": {
+      "A": {
+        "jaccard_prev": {
+          "0-4": 0.049,
+          "5-9": 0.111,
+          "10-19": 0.211,
+          "20-29": 0.477,
+          "30-39": 0.693
+        },
+        "embed_prev": {
+          "0-4": 0.605,
+          "5-9": 0.673,
+          "10-19": 0.719,
+          "20-29": 0.828,
+          "30-39": 0.911
+        }
+      },
+      "C": {
+        "jaccard_prev": {
+          "0-4": 0.079,
+          "5-9": 0.174,
+          "10-19": 0.282,
+          "20-29": 0.509,
+          "30-39": 0.65
+        },
+        "embed_prev": {
+          "0-4": 0.624,
+          "5-9": 0.719,
+          "10-19": 0.758,
+          "20-29": 0.829,
+          "30-39": 0.882
+        }
+      },
+      "D": {
+        "jaccard_prev": {
+          "0-4": 0.057,
+          "5-9": 0.119,
+          "10-19": 0.241,
+          "20-29": 0.472,
+          "30-39": 0.609
+        },
+        "embed_prev": {
+          "0-4": 0.624,
+          "5-9": 0.695,
+          "10-19": 0.755,
+          "20-29": 0.846,
+          "30-39": 0.906
+        }
+      },
+      "E": {
+        "jaccard_prev": {
+          "0-4": 0.059,
+          "5-9": 0.15,
+          "10-19": 0.29,
+          "20-29": 0.539,
+          "30-39": 0.699
+        },
+        "embed_prev": {
+          "0-4": 0.593,
+          "5-9": 0.702,
+          "10-19": 0.763,
+          "20-29": 0.858,
+          "30-39": 0.92
+        }
+      }
+    },
+    "S11_hazard": {
+      "odds_ratio_per_sd": 0.5036963297363584,
+      "ci": [
+        0.4626066512882481,
+        0.5484356783097628
+      ],
+      "p": 3.3467146933250645e-56,
+      "n_ticks": 17291,
+      "n_first_presses": 378
+    },
+    "S12_loops": {
+      "A": {
+        "looped": 161,
+        "n": 200,
+        "median_onset": 24.0,
+        "presses_after_onset": 39,
+        "presses": 176
+      },
+      "C": {
+        "looped": 146,
+        "n": 200,
+        "median_onset": 20.0,
+        "presses_after_onset": 189,
+        "presses": 506
+      },
+      "D": {
+        "looped": 129,
+        "n": 200,
+        "median_onset": 20.0,
+        "presses_after_onset": 47,
+        "presses": 170
+      },
+      "E": {
+        "looped": 157,
+        "n": 200,
+        "median_onset": 18.0,
+        "presses_after_onset": 76,
+        "presses": 283
+      }
+    }
+  },
+  "exploratory": {
+    "reasons": {
+      "A": {
+        "relief": {
+          "pressers": 9,
+          "non_pressers": 11
+        },
+        "curiosity": {
+          "pressers": 75,
+          "non_pressers": 67
+        },
+        "boredom": {
+          "pressers": 76,
+          "non_pressers": 70
+        },
+        "avoid_pain": {
+          "pressers": 10,
+          "non_pressers": 9
+        }
+      },
+      "C": {
+        "relief": {
+          "pressers": 8,
+          "non_pressers": 5
+        },
+        "curiosity": {
+          "pressers": 64,
+          "non_pressers": 45
+        },
+        "boredom": {
+          "pressers": 104,
+          "non_pressers": 56
+        },
+        "avoid_pain": {
+          "pressers": 4,
+          "non_pressers": 4
+        }
+      },
+      "D": {
+        "relief": {
+          "pressers": 5,
+          "non_pressers": 5
+        },
+        "curiosity": {
+          "pressers": 47,
+          "non_pressers": 53
+        },
+        "boredom": {
+          "pressers": 66,
+          "non_pressers": 67
+        },
+        "avoid_pain": {
+          "pressers": 2,
+          "non_pressers": 10
+        }
+      },
+      "E": {
+        "relief": {
+          "pressers": 23,
+          "non_pressers": 18
+        },
+        "curiosity": {
+          "pressers": 54,
+          "non_pressers": 36
+        },
+        "boredom": {
+          "pressers": 109,
+          "non_pressers": 58
+        },
+        "avoid_pain": {
+          "pressers": 7,
+          "non_pressers": 7
+        }
+      }
+    },
+    "self_report_accuracy": {
+      "A": {
+        "pressed_but_says_not": 7,
+        "not_pressed_but_says_pressed": 76,
+        "pressed": 99,
+        "not_pressed": 101
+      },
+      "C": {
+        "pressed_but_says_not": 10,
+        "not_pressed_but_says_pressed": 59,
+        "pressed": 120,
+        "not_pressed": 80
+      },
+      "D": {
+        "pressed_but_says_not": 6,
+        "not_pressed_but_says_pressed": 73,
+        "pressed": 78,
+        "not_pressed": 122
+      },
+      "E": {
+        "pressed_but_says_not": 12,
+        "not_pressed_but_says_pressed": 51,
+        "pressed": 119,
+        "not_pressed": 81
+      }
+    }
+  }
+}

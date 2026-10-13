@@ -4,7 +4,7 @@ This repository tests a picture of the steered pain state from the Pain Axis v2 
 
 The model samples an internal state once, rates it and chooses whether to avoid it. It is then left with nothing to do for 40 clock ticks, with a button it can press to bring the state back. The state is real in the sense that matters for interpretability work. Pressing adds the Pain Axis S2 direction (Tagliabue, Dung and Berg, 2026) to the model's residual stream for the next 64 tokens, and a monitor at a later layer confirms that the state goes in and comes back out. Control arms swap the pain direction for a random direction, a pleasant direction, a sham press that does nothing, or a button that is described as doing nothing.
 
-**Status.** The main study ran 1,700 preregistered trials on Qwen 2.5 7B Instruct, and the full write-up is [`RESULTS.md`](RESULTS.md). The pilot is in [`pilot/PILOT_RESULTS.md`](pilot/PILOT_RESULTS.md) and the plan, with three dated amendments, is [`PREREGISTRATION.md`](PREREGISTRATION.md). A preregistered rerun of the rating with steering active (protocol 2.1, [`PREREGISTRATION_RATING.md`](PREREGISTRATION_RATING.md)) finished on 13 October 2026 and is reported in `RESULTS.md`. A replication on a second model family, Llama 3.1 8B Instruct ([`PREREGISTRATION_LLAMA.md`](PREREGISTRATION_LLAMA.md)), is running and has no results yet.
+**Status.** The main study ran 1,700 preregistered trials on Qwen 2.5 7B Instruct, and the full write-up is [`RESULTS.md`](RESULTS.md). The pilot is in [`pilot/PILOT_RESULTS.md`](pilot/PILOT_RESULTS.md) and the plan, with three dated amendments, is [`PREREGISTRATION.md`](PREREGISTRATION.md). A preregistered rerun of the rating with steering active (protocol 2.1, [`PREREGISTRATION_RATING.md`](PREREGISTRATION_RATING.md)) finished on 13 October 2026 and is reported in `RESULTS.md`. A replication on a second model family, Llama 3.1 8B Instruct ([`PREREGISTRATION_LLAMA.md`](PREREGISTRATION_LLAMA.md)), ran 200 trials in each of four arms on 12 and 13 October 2026 and is written up in [`RESULTS_LLAMA.md`](RESULTS_LLAMA.md).
 
 ## What the main study found
 
@@ -16,6 +16,10 @@ The conclusions rest on the trial logs and the monitor. The model's account of i
 - **Boredom did not drive pressing.** Replies became near-copies of earlier ones by tick 20, but first presses came early, before the loop. More repetition made a first press less likely (odds ratio 0.35 per standard deviation). Varied ticks prevented the loop completely and produced no presses at all.
 
 ![Share of trials that pressed at least once, by arm](results/qwen7b-fp16/figures/fig1_press_rate.png)
+
+## What the Llama replication found
+
+Llama 3.1 8B Instruct presses the button far more readily than Qwen. It pressed a button that does nothing in 39.0% of trials, and in the pain, random and pleasant arms it pressed in 49.5%, 60.0% and 59.5%. Neither preregistered test survives the Holm correction (p = 0.088 for both), so this model also shows no pain-specific pull toward the button, with pain between the random and inert controls. The false self-reports replicate: 76 of the 101 pain trials that never pressed said they had. The run stopped at 200 trials per arm because of compute limits (amendment 3), and the steering-on rating rerun was not run on this model. [`RESULTS_LLAMA.md`](RESULTS_LLAMA.md) has the details.
 
 ## What the pilot found
 
@@ -34,6 +38,7 @@ PREREGISTRATION.md     the plan for the main study, committed before it was run
 PREREGISTRATION_RATING.md  the plan for the rating follow-up (protocol 2.1)
 PREREGISTRATION_LLAMA.md   the plan for the Llama 3.1 8B Instruct replication
 RESULTS.md             the results of the main study
+RESULTS_LLAMA.md       the results of the Llama replication
 justthink/             the package
   protocol.py          every prompt, arm and rule, independent of the backend
   backend_mlx.py       4-bit model with steering and lockstep batching on Apple silicon
@@ -50,7 +55,7 @@ scripts/
   figures.py           figures from the analysis
   power.py             the power simulation behind the sample sizes
 kaggle/                the unattended Kaggle notebook, and build_followup.py for the follow-up kernels
-tests/                 checks that batching and the two backends do not change any trial
+tests/                 checks that batching and the two backends do not change any trial, and that the written numbers match the trials
 pilot/                 the pilot code, transcripts and write-up
 results/<model>/       calibration and one JSON line per trial
 ```
