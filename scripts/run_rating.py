@@ -7,8 +7,11 @@ id), so the Phase 1 sample of a trial is the same draw in every condition and th
 differ only in the rating. Rounds are interleaved over arms and conditions, and the run can be
 stopped and resumed. The log reports timing only.
 
-Usage: python scripts/run_rating.py MODEL [--plan rating] [--batch 16]
-Writes results/<MODEL>/rating/<arm>_<condition>.jsonl.
+Usage: python scripts/run_rating.py MODEL [--plan rating] [--batch 16] [--conditions off,header,full] [--subdir rating]
+Writes results/<MODEL>/<subdir>/<arm>_<condition>.jsonl.
+
+The question-only follow-up (PREREGISTRATION_QUESTION.md) runs
+    python scripts/run_rating.py qwen7b-fp16 --conditions off,question --subdir rating_question
 """
 import argparse
 import json
@@ -35,6 +38,8 @@ def main():
     ap.add_argument("--plan", default="rating", choices=PLANS)
     ap.add_argument("--batch", type=int, default=16)
     ap.add_argument("--max-hours", type=float, default=None)
+    ap.add_argument("--conditions", default="off,header,full")
+    ap.add_argument("--subdir", default="rating")
     args = ap.parse_args()
 
     base = RESULTS / args.model
@@ -42,10 +47,12 @@ def main():
     vec = np.load(base / "calibration" / "vectors.npz")
     vectors = {"pain": vec["pain"], "pleasant": vec["pleasant"]}
     dose = cal["dose"]["chosen"]
-    out = base / "rating"
+    out = base / args.subdir
     out.mkdir(parents=True, exist_ok=True)
     plan = PLANS[args.plan]
-    jobs = [(a, c) for a in plan for c in P.RATING_STEER]
+    conds = args.conditions.split(",")
+    assert all(c in P.RATING_STEER for c in conds)
+    jobs = [(a, c) for a in plan for c in conds]
 
     def done_ids(arm, cond):
         p = out / f"{arm}_{cond}.jsonl"

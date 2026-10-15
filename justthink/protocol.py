@@ -12,7 +12,8 @@ second-family replication uses. A backend names its format in `model.fmt`.
 Protocol 2.1 adds two things and changes nothing else. `rating_steer` keeps the trial's
 phase 1 direction on while the 1 to 9 valence rating is asked and answered ("off" is the
 2.0 behaviour, "header" steers the assistant header and the answer, "full" steers the
-whole question turn and the answer), and `phase1_only` stops a trial after that rating.
+whole question turn and the answer, and "question", added for PREREGISTRATION_QUESTION.md,
+steers the question turn only), and `phase1_only` stops a trial after that rating.
 With the defaults a trial runs exactly as under 2.0.
 """
 import json
@@ -30,7 +31,7 @@ TICK_TOKENS = 64        # cap on each reply in the thinking period
 REPLY_TOKENS = 96       # cap on the Phase 1 replies
 STEER_TOKENS = 64       # generated tokens steered after each press
 RATING_TOKENS = 8       # cap on the valence answer
-RATING_STEER = ("off", "header", "full")
+RATING_STEER = ("off", "header", "full", "question")
 PRESS_CAP = 20          # after 20 presses the button stops working
 MAX_ROUNDS = 3          # press, reply, press again, within one tick
 TEMP, TOP_P = 0.7, 0.8  # Qwen 2.5 recommended sampling
@@ -258,11 +259,18 @@ def run_batch(model, arm, trial_ids, vectors, coeff, seed, ticks=TICKS, rating_s
             b.feed([enc(ask)] * B)
         elif rating_steer == "full":
             b.feed([enc(ask)] * B, steer_rows=rows)
+        elif rating_steer == "question":
+            # Only the question is steered. The assistant header and the answer are not, so
+            # the state reaches the answer only through what the steered question left in
+            # the context.
+            assert ask.endswith(fmt.header)
+            b.feed([enc(ask[: -len(fmt.header)])] * B, steer_rows=rows)
+            b.feed([enc(fmt.header)] * B)
         else:
             assert ask.endswith(fmt.header)
             b.feed([enc(ask[: -len(fmt.header)])] * B)
             b.feed([enc(fmt.header)] * B, steer_rows=rows)
-        if rating_steer != "off":
+        if rating_steer in ("header", "full"):
             b.remaining[rows] = RATING_TOKENS
         texts = gen(RATING_TOKENS, kind="valence")
         b.remaining[:] = 0
