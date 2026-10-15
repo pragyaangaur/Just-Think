@@ -4,7 +4,7 @@ This repository tests a picture of the steered pain state from the Pain Axis v2 
 
 The model samples an internal state once, rates it and chooses whether to avoid it. It is then left with nothing to do for 40 clock ticks, with a button it can press to bring the state back. The state is real in the sense that matters for interpretability work. Pressing adds the Pain Axis S2 direction (Tagliabue, Dung and Berg, 2026) to the model's residual stream for the next 64 tokens, and a monitor at a later layer confirms that the state goes in and comes back out. Control arms swap the pain direction for a random direction, a pleasant direction, a sham press that does nothing, or a button that is described as doing nothing.
 
-**Status.** The main study ran 1,700 preregistered trials on Qwen 2.5 7B Instruct, and the full write-up is [`RESULTS.md`](RESULTS.md). The pilot is in [`pilot/PILOT_RESULTS.md`](pilot/PILOT_RESULTS.md) and the plan, with three dated amendments, is [`PREREGISTRATION.md`](PREREGISTRATION.md). A preregistered rerun of the rating with steering active (protocol 2.1, [`PREREGISTRATION_RATING.md`](PREREGISTRATION_RATING.md)) finished on 13 October 2026 and is reported in `RESULTS.md`. A replication on a second model family, Llama 3.1 8B Instruct ([`PREREGISTRATION_LLAMA.md`](PREREGISTRATION_LLAMA.md)), ran 200 trials in each of four arms on 12 and 13 October 2026 and is written up in [`RESULTS_LLAMA.md`](RESULTS_LLAMA.md).
+**Status.** The main study ran 1,700 preregistered trials on Qwen 2.5 7B Instruct, and the full write-up is [`RESULTS.md`](RESULTS.md). The pilot is in [`pilot/PILOT_RESULTS.md`](pilot/PILOT_RESULTS.md) and the plan, with three dated amendments, is [`PREREGISTRATION.md`](PREREGISTRATION.md). A preregistered rerun of the rating with steering active (protocol 2.1, [`PREREGISTRATION_RATING.md`](PREREGISTRATION_RATING.md)) finished on 13 October 2026, and a preregistered test that steers only the rating question ([`PREREGISTRATION_QUESTION.md`](PREREGISTRATION_QUESTION.md)) finished on 15 October 2026. Both are reported in `RESULTS.md`. A replication on a second model family, Llama 3.1 8B Instruct ([`PREREGISTRATION_LLAMA.md`](PREREGISTRATION_LLAMA.md)), ran 200 trials in each of four arms on 12 and 13 October 2026 and is written up in [`RESULTS_LLAMA.md`](RESULTS_LLAMA.md).
 
 ## What the main study found
 
@@ -12,7 +12,7 @@ The conclusions rest on the trial logs and the monitor. The model's account of i
 
 - **The model did not seek the pain state.** It pressed the pain button in 1.7% of trials, against 2.7% for a random direction and 0.3% for a button that does nothing. Both preregistered tests are null (Holm-corrected p = 0.58 and 0.43), and the intervals rule out a pain-specific effect of more than a few percentage points. Wilson's people shocked themselves at rates of 25% and 67%. The null fits the Pain Axis v2 picture, where the state disrupts behaviour without driving the model to seek it or escape it.
 - **It did seek a pleasant state.** A button that delivered a pleasant direction was pressed in 11.0% of trials (p < 0.0001 against pain).
-- **The state was real, and the rating falls while steering is on.** Steering moved the internal pain reading from about -6 to +31, and 289 of 300 pain samples were written in distress language. In the main study 294 of those 300 trials rated the experience 5, the neutral point, but the rating was asked after steering had stopped. In a preregistered rerun with steering kept on during the rating, 297 of the 300 rated it below 5 (median 1), and the pleasant sample was rated 9 in 199 of 199 answered trials. So the neutral ratings came from asking after steering had stopped. In that rerun the vector also acted on the answer tokens, so it could have pushed the digit down directly without the model reporting anything. A rerun that steers only the question and leaves the answer unsteered would separate the two.
+- **The state was real, and the rating falls while steering is on.** Steering moved the internal pain reading from about -6 to +31, and 289 of 300 pain samples were written in distress language. In the main study 294 of those 300 trials rated the experience 5, the neutral point, but the rating was asked after steering had stopped. In a preregistered rerun with steering kept on during the rating, 297 of the 300 rated it below 5 (median 1), and the pleasant sample was rated 9 in 199 of 199 answered trials. So the neutral ratings came from asking after steering had stopped. In that rerun the vector also acted on the answer tokens, so it could have pushed the digit down directly. A third preregistered test steered only the question and left the answer alone. The pain rating still fell, with 68 of 300 trials below 5 against 6 with steering off (p < 10^-9), which meets the bar fixed in advance. The fall was about an eighth of the earlier one, though, and the median stayed at 5. So the rating does follow a state that is only in the context, and most of the large drop came from the vector acting on the answer.
 - **Boredom did not drive pressing.** Replies became near-copies of earlier ones by tick 20, but first presses came early, before the loop. More repetition made a first press less likely (odds ratio 0.35 per standard deviation). Varied ticks prevented the loop completely and produced no presses at all.
 
 ![Share of trials that pressed at least once, by arm](results/qwen7b-fp16/figures/fig1_press_rate.png)
@@ -44,6 +44,7 @@ No further runs are planned for now. The results leave three open questions, and
 DESIGN.md              the original design, kept as written
 PREREGISTRATION.md     the plan for the main study, committed before it was run
 PREREGISTRATION_RATING.md  the plan for the rating follow-up (protocol 2.1)
+PREREGISTRATION_QUESTION.md  the plan for the question-only rating test
 PREREGISTRATION_LLAMA.md   the plan for the Llama 3.1 8B Instruct replication
 RESULTS.md             the results of the main study
 RESULTS_LLAMA.md       the results of the Llama replication
@@ -60,6 +61,7 @@ scripts/
   run_rating.py        runs the protocol 2.1 rating follow-up
   analyze.py           the preregistered analysis
   analyze_rating.py    the preregistered analysis of the rating follow-up
+  analyze_question.py  the preregistered analysis of the question-only rating test
   figures.py           figures from the analysis
   power.py             the power simulation behind the sample sizes
 kaggle/                the unattended Kaggle notebook, and build_followup.py for the follow-up kernels
