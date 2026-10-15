@@ -80,3 +80,20 @@ def test_share_of_the_full_shift():
     mo, mq, mf = (np.mean([d[t]["valence"] for t in ids]) for d in (o, q, f))
     assert round((mo - mq) / (mo - mf), 2) == 0.29
     assert "about 12% of the fall" in RESULTS and "about 29% of the rise" in RESULTS
+
+
+def test_exploratory_monitor_and_movers():
+    from scipy.stats import mannwhitneyu
+    o, q = load(Q, "A", "off"), load(Q, "A", "question")
+    po = np.array([o[t]["events"][1]["proj"] for t in range(300)])
+    pq = np.array([q[t]["events"][1]["proj"] for t in range(300)])
+    assert round(po.mean(), 1) == -16.4 and round(pq.mean(), 1) == -13.4 and (pq > po).sum() == 300
+    for cond, v in (("header", 11.6), ("full", 43.7)):
+        assert round(np.mean([r["events"][1]["proj"] for r in load(OLD, "A", cond).values()]), 1) == v
+    moved = [t for t in range(300) if q[t]["valence"] != o[t]["valence"]]
+    still = [t for t in range(300) if t not in moved]
+    a = [o[t]["events"][0]["proj"] for t in moved]
+    b = [o[t]["events"][0]["proj"] for t in still]
+    assert (round(np.median(a), 1), round(np.median(b), 1)) == (29.3, 28.5)
+    assert round(mannwhitneyu(a, b).pvalue, 3) == 0.006
+    assert "higher in all 300 pain trials" in RESULTS
