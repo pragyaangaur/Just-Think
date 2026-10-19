@@ -12,6 +12,9 @@ Writes results/<MODEL>/<subdir>/<arm>_<condition>.jsonl.
 
 The question-only follow-up (PREREGISTRATION_QUESTION.md) runs
     python scripts/run_rating.py qwen7b-fp16 --conditions off,question --subdir rating_question
+
+The Llama rating follow-up (amendment 4 of PREREGISTRATION_LLAMA.md) runs
+    python scripts/run_rating.py llama8b-fp16 --plan llama --batch 8
 """
 import argparse
 import json
@@ -28,6 +31,8 @@ from justthink.paths import RESULTS
 PLANS = {
     # The main study's sizes for the pain, random and pleasant arms.
     "rating": {"A": 300, "C": 300, "E": 200},
+    # The Llama replication's sizes after amendment 3 of PREREGISTRATION_LLAMA.md.
+    "llama": {"A": 200, "C": 200, "E": 200},
     "smoke": {"A": 2, "C": 2, "E": 2, "D": 2},
 }
 
