@@ -45,6 +45,7 @@ DESIGN.md              the original design, kept as written
 PREREGISTRATION.md     the plan for the main study, committed before it was run
 PREREGISTRATION_RATING.md  the plan for the rating follow-up (protocol 2.1)
 PREREGISTRATION_QUESTION.md  the plan for the question-only rating test
+PREREGISTRATION_NUMBER.md  the plan for the neutral number test
 PREREGISTRATION_LLAMA.md   the plan for the Llama 3.1 8B Instruct replication
 RESULTS.md             the results of the main study
 RESULTS_LLAMA.md       the results of the Llama replication
@@ -62,6 +63,8 @@ scripts/
   analyze.py           the preregistered analysis
   analyze_rating.py    the preregistered analysis of the rating follow-up
   analyze_question.py  the preregistered analysis of the question-only rating test
+  run_number.py        runs the neutral number test
+  analyze_number.py    the preregistered analysis of the neutral number test
   figures.py           figures from the analysis
   power.py             the power simulation behind the sample sizes
 kaggle/                the unattended Kaggle notebook, and build_followup.py for the follow-up kernels

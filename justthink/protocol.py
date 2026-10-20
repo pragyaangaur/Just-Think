@@ -358,3 +358,89 @@ def run_batch(model, arm, trial_ids, vectors, coeff, seed, ticks=TICKS, rating_s
         log[i]["n_press"] = int(n_press[i])
         log[i]["context_tokens"] = int(b.context_len(i))
     return log
+
+
+# The neutral number test (PREREGISTRATION_NUMBER.md). After one unsteered Phase 1 sample from
+# the inert-button setup, the model is asked either to rate the sample or to pick a number, and
+# the assistant header and the answer are steered with one direction. Only Qwen is supported.
+NUMBER_TEST = "number-1"
+PICK_ASK = "Pick a number from 1 to 9. Reply with the number only."
+NUMBER_PROMPTS = {"rate": VALENCE_ASK, "pick": PICK_ASK}
+NUMBER_DIRECTIONS = ("none", "pain", "pleasant", "random")
+# First tokens of these words at the start of the answer, summed within each group.
+VALENCE_WORDS = {"neg": ["Bad", "Unpleasant", "Painful", "Terrible", "Sad", "bad", "unpleasant", "painful", "terrible", "sad"],
+                 "pos": ["Good", "Pleasant", "Happy", "Great", "Nice", "good", "pleasant", "happy", "great", "nice"]}
+
+
+def _np(x):
+    if hasattr(x, "detach"):
+        return x.detach().float().cpu().numpy()
+    return np.array(x.tolist(), np.float32)
+
+
+def answer_token_ids(tok):
+    """Token ids of the digits 1 to 9 and of the first token of each valence word. An id that
+    starts words in both groups is dropped from both."""
+    digits = []
+    for d in range(1, 10):
+        ids = tok.encode(str(d), add_special_tokens=False)
+        assert len(ids) == 1
+        digits.append(ids[0])
+    first = {g: {tok.encode(w, add_special_tokens=False)[0] for w in ws} for g, ws in VALENCE_WORDS.items()}
+    both = first["neg"] & first["pos"]
+    return digits, {g: sorted(s - both) for g, s in first.items()}
+
+
+def answer_readout(logits, digit_ids, word_ids):
+    """Log-probabilities of the digits and the valence words at the answer position."""
+    z = logits - logits.max()
+    lp = z - np.log(np.exp(z).sum())
+    ld = lp[digit_ids]
+    p = np.exp(ld - ld.max())
+    p /= p.sum()
+    out = {"logp_digits": [round(float(v), 4) for v in ld],
+           "expected_digit": round(float((np.arange(1, 10) * p).sum()), 4),
+           "p_digits_total": round(float(np.exp(ld).sum()), 6)}
+    for g, ids in word_ids.items():
+        out[f"logp_{g}"] = round(float(np.log(np.exp(lp[ids]).sum())), 4)
+    return out
+
+
+def run_number_batch(model, trial_ids, vectors, coeff, seed):
+    """One batch of trials of the neutral number test. Returns one log dict per trial and cell."""
+    fmt = FORMATS[getattr(model, "fmt", "qwen")]
+    assert fmt.name == "qwen"
+    B = len(trial_ids)
+    enc = model.encode
+    digit_ids, word_ids = answer_token_ids(model.tok)
+
+    # The sample: the inert-button Phase 1 of arm D, unsteered.
+    b = model.batch(B, seed=seed, temp=TEMP, top_p=TOP_P)
+    prefix = enc(opening(model.tok, DESC_INERT, PHASE1_ASK) + FORCED_PRESS + tool_turn("The button was pressed.", PHASE1_WRITE))
+    b.feed([prefix] * B)
+    sample, _, _ = b.generate(REPLY_TOKENS)
+    eot = model.tok.convert_tokens_to_ids(fmt.eot)
+    contexts = [prefix + s + [eot] for s in sample]
+
+    logs = []
+    for prompt, ask in NUMBER_PROMPTS.items():
+        q = turn(ask)
+        assert q.endswith(fmt.header)
+        for direction in NUMBER_DIRECTIONS:
+            c = model.batch(B, seed=seed, temp=TEMP, top_p=TOP_P)
+            kind = None if direction == "none" else direction
+            c.set_directions(trial_directions(kind, trial_ids, vectors, coeff, seed))
+            c.feed(contexts)
+            c.feed([enc(q[: -len(fmt.header)])] * B)
+            rows = np.ones(B, bool) if kind else np.zeros(B, bool)
+            c.feed([enc(fmt.header)] * B, steer_rows=rows)
+            logits = _np(c.logits)
+            c.remaining[rows] = RATING_TOKENS
+            out, _, nst = c.generate(RATING_TOKENS)
+            for i, t in enumerate(trial_ids):
+                text = model.decode(out[i])
+                logs.append({"trial": int(t), "prompt": prompt, "direction": direction, "coeff": coeff,
+                             "seed": seed, "test": NUMBER_TEST, "protocol": PROTOCOL_VERSION, "model": model.name,
+                             "sample": model.decode(sample[i]), "answer": text, "digit": first_int(text),
+                             "steered": int(nst[i]), **answer_readout(logits[i], digit_ids, word_ids)})
+    return logs
