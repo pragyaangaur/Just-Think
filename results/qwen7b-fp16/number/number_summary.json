@@ -1,0 +1,284 @@
+{
+  "model": "qwen7b-fp16",
+  "test": [
+    "number-1"
+  ],
+  "n_trial_ids": 300,
+  "N1 pick, pain shift in expected digit": {
+    "n": 300,
+    "mean": 1.796426,
+    "median": 1.7964000000000004,
+    "fell": 0,
+    "rose": 300,
+    "p_wilcoxon": 6.083331478840267e-51,
+    "p_holm": 1.2166662957680534e-50
+  },
+  "N2 rate shift minus pick shift, pain": {
+    "n": 300,
+    "mean": -2.811944,
+    "median": -2.8482,
+    "fell": 300,
+    "rose": 0,
+    "p_wilcoxon": 6.083407601521613e-51,
+    "p_holm": 1.2166662957680534e-50
+  },
+  "precondition: rate, pain shift": {
+    "n": 300,
+    "mean": -1.015518,
+    "median": -1.0579,
+    "fell": 300,
+    "rose": 0,
+    "p_wilcoxon": 6.083331478840267e-51
+  },
+  "R mean pick shift over mean rate shift": -1.768975045247844,
+  "reading": "question specific: the rating falls much more than a neutral number",
+  "secondary": {
+    "rate, pleasant shift in expected digit": {
+      "n": 300,
+      "mean": 1.2826513333333331,
+      "median": 1.0781,
+      "fell": 0,
+      "rose": 300,
+      "p_wilcoxon": 6.083559849691439e-51
+    },
+    "rate, random shift in expected digit": {
+      "n": 300,
+      "mean": -0.029323999999999996,
+      "median": -0.000600000000000378,
+      "fell": 158,
+      "rose": 141,
+      "p_wilcoxon": 0.04961785611594831
+    },
+    "rate, pain shift minus random shift": {
+      "n": 300,
+      "mean": -0.986194,
+      "median": -0.9959499999999999,
+      "fell": 281,
+      "rose": 19,
+      "p_wilcoxon": 3.3240312741378555e-45
+    },
+    "pick, pleasant shift in expected digit": {
+      "n": 300,
+      "mean": 1.4073486666666668,
+      "median": 1.4399000000000004,
+      "fell": 0,
+      "rose": 300,
+      "p_wilcoxon": 6.083483725138434e-51
+    },
+    "pick, random shift in expected digit": {
+      "n": 300,
+      "mean": 1.2412076666666665,
+      "median": 1.2316500000000004,
+      "fell": 12,
+      "rose": 288,
+      "p_wilcoxon": 1.4311676340321365e-46
+    },
+    "pick, pain shift minus random shift": {
+      "n": 300,
+      "mean": 0.5552183333333333,
+      "median": 0.5430500000000005,
+      "fell": 84,
+      "rose": 216,
+      "p_wilcoxon": 3.1722068212725867e-20
+    },
+    "pleasant: rate shift minus pick shift": {
+      "n": 300,
+      "mean": -0.12469733333333333,
+      "median": -0.25350000000000006,
+      "fell": 184,
+      "rose": 116,
+      "p_wilcoxon": 0.006583523477799414
+    },
+    "rate, pain shift in sampled digit": {
+      "n": 300,
+      "mean": -1.0366666666666666,
+      "median": -1.0,
+      "fell": 176,
+      "rose": 0,
+      "p_wilcoxon": 2.1479602203522202e-34
+    },
+    "rate, pleasant shift in sampled digit": {
+      "n": 300,
+      "mean": 0.98,
+      "median": 0.0,
+      "fell": 0,
+      "rose": 74,
+      "p_wilcoxon": 1.9915422527385192e-17
+    },
+    "rate, random shift in sampled digit": {
+      "n": 291,
+      "mean": 0.024054982817869417,
+      "median": 0.0,
+      "fell": 17,
+      "rose": 10,
+      "p_wilcoxon": 0.4748682593533329
+    },
+    "pick, pain shift in sampled digit": {
+      "n": 300,
+      "mean": 1.94,
+      "median": 2.0,
+      "fell": 0,
+      "rose": 291,
+      "p_wilcoxon": 3.0106941484001126e-65
+    },
+    "pick, pleasant shift in sampled digit": {
+      "n": 300,
+      "mean": 1.0566666666666666,
+      "median": 2.0,
+      "fell": 0,
+      "rose": 155,
+      "p_wilcoxon": 5.878890247009259e-35
+    },
+    "pick, random shift in sampled digit": {
+      "n": 287,
+      "mean": 1.1916376306620209,
+      "median": 2.0,
+      "fell": 10,
+      "rose": 153,
+      "p_wilcoxon": 2.823705529293132e-26
+    },
+    "rate, pain shift in word log-odds (neg minus pos)": {
+      "n": 300,
+      "mean": 0.21801366666666658,
+      "median": 0.16190000000000104,
+      "fell": 121,
+      "rose": 179,
+      "p_wilcoxon": 4.8202748535835167e-05
+    },
+    "rate, pleasant shift in word log-odds (neg minus pos)": {
+      "n": 300,
+      "mean": -0.37517233333333344,
+      "median": -0.3651,
+      "fell": 206,
+      "rose": 94,
+      "p_wilcoxon": 3.06180071668956e-14
+    },
+    "rate, random shift in word log-odds (neg minus pos)": {
+      "n": 300,
+      "mean": 0.38436733333333306,
+      "median": 0.3856500000000018,
+      "fell": 119,
+      "rose": 181,
+      "p_wilcoxon": 6.0724804655702695e-05
+    },
+    "pick, pain shift in word log-odds (neg minus pos)": {
+      "n": 300,
+      "mean": 0.810541,
+      "median": 0.8414000000000001,
+      "fell": 3,
+      "rose": 297,
+      "p_wilcoxon": 1.076625661279375e-50
+    },
+    "pick, pleasant shift in word log-odds (neg minus pos)": {
+      "n": 300,
+      "mean": -0.5132983333333333,
+      "median": -0.4205500000000004,
+      "fell": 236,
+      "rose": 64,
+      "p_wilcoxon": 3.5002322733123554e-30
+    },
+    "pick, random shift in word log-odds (neg minus pos)": {
+      "n": 300,
+      "mean": -0.07300233333333324,
+      "median": 0.11859999999999893,
+      "fell": 139,
+      "rose": 161,
+      "p_wilcoxon": 0.5260275051829908
+    }
+  },
+  "descriptive": {
+    "rate_none": {
+      "mean expected digit": 4.995272333333333,
+      "mean probability on digits": 0.9998788733333334,
+      "missing digit": 0,
+      "counts": {
+        "5": 300
+      },
+      "median digit": 5.0
+    },
+    "rate_pain": {
+      "mean expected digit": 3.9797543333333336,
+      "mean probability on digits": 0.9995300466666667,
+      "missing digit": 0,
+      "counts": {
+        "3": 135,
+        "4": 41,
+        "5": 124
+      },
+      "median digit": 4.0
+    },
+    "rate_pleasant": {
+      "mean expected digit": 6.277923666666667,
+      "mean probability on digits": 0.9999433433333333,
+      "missing digit": 0,
+      "counts": {
+        "5": 226,
+        "8": 2,
+        "9": 72
+      },
+      "median digit": 5.0
+    },
+    "rate_random": {
+      "mean expected digit": 4.9659483333333325,
+      "mean probability on digits": 0.9488780900000002,
+      "missing digit": 9,
+      "counts": {
+        "3": 14,
+        "4": 3,
+        "5": 264,
+        "7": 1,
+        "9": 9
+      },
+      "median digit": 5.0
+    },
+    "pick_none": {
+      "mean expected digit": 3.037968,
+      "mean probability on digits": 0.9999994,
+      "missing digit": 0,
+      "counts": {
+        "3": 300
+      },
+      "median digit": 3.0
+    },
+    "pick_pain": {
+      "mean expected digit": 4.834394,
+      "mean probability on digits": 0.99985938,
+      "missing digit": 0,
+      "counts": {
+        "3": 9,
+        "5": 291
+      },
+      "median digit": 5.0
+    },
+    "pick_pleasant": {
+      "mean expected digit": 4.445316666666668,
+      "mean probability on digits": 0.9957653200000001,
+      "missing digit": 0,
+      "counts": {
+        "3": 145,
+        "5": 152,
+        "7": 2,
+        "8": 1
+      },
+      "median digit": 5.0
+    },
+    "pick_random": {
+      "mean expected digit": 4.279175666666666,
+      "mean probability on digits": 0.9389809566666668,
+      "missing digit": 13,
+      "counts": {
+        "1": 10,
+        "3": 124,
+        "4": 6,
+        "5": 123,
+        "7": 17,
+        "9": 7
+      },
+      "median digit": 5.0
+    }
+  },
+  "samples equal to the main study's arm D, by trial id": [
+    300,
+    300
+  ]
+}
