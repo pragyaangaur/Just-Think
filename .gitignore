@@ -23,3 +23,6 @@ AGENTS.md
 
 # Built Kaggle kernels
 kaggle/push/
+
+# The preprint, its source and the Zenodo upload package stay local
+paper/

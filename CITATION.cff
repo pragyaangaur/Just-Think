@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this code or these trials, please cite them as below."
+title: "Left Alone with a Pain Button: A Preregistered Test of Whether Language Models Seek a Steered Pain State"
+authors:
+  - family-names: Gaur
+    given-names: Pragyaan
+    orcid: "https://orcid.org/0009-0009-4037-2478"
+version: "1.0.0"
+date-released: 2026-10-21
+license: MIT
+repository-code: "https://github.com/pragyaangaur/Just-Think"
+keywords:
+  - activation steering
+  - model welfare
+  - pain axis
+  - self-report
+  - introspection
+  - preregistration
