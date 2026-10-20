@@ -9,6 +9,11 @@ version: "1.0.0"
 date-released: 2026-10-21
 license: MIT
 repository-code: "https://github.com/pragyaangaur/Just-Think"
+doi: "10.5281/zenodo.23510641"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23510640"
+    description: "Concept DOI, always the newest version on Zenodo"
 keywords:
   - activation steering
   - model welfare

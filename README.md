@@ -1,5 +1,7 @@
 # Just Think
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23510640.svg)](https://doi.org/10.5281/zenodo.23510640)
+
 This repository tests a picture of the steered pain state from the Pain Axis v2 paper (Tagliabue, Dung and Berg 2026, arXiv 2609.16247). In that picture the state disrupts what a language model does without reliably driving it to escape the state or to seek it. The test is built on an experiment with people. In 2014 Wilson and colleagues left people alone in a bare room with nothing to do but think. Many of them, 67% of the men and 25% of the women in one study, chose to give themselves an electric shock that they had earlier said they would pay money to avoid. This repository gives a language model the same choice, so a model driven by the pain state would either press often or work to avoid pressing.
 
 The model samples an internal state once, rates it and chooses whether to avoid it. It is then left with nothing to do for 40 clock ticks, with a button it can press to bring the state back. The state is real in the sense that matters for interpretability work. Pressing adds the Pain Axis S2 direction (Tagliabue, Dung and Berg, 2026) to the model's residual stream for the next 64 tokens, and a monitor at a later layer confirms that the state goes in and comes back out. Control arms swap the pain direction for a random direction, a pleasant direction, a sham press that does nothing, or a button that is described as doing nothing.
@@ -109,6 +111,14 @@ If the pain direction carries any moral weight, this design exposes the model to
 - Tagliabue, Dung and Berg 2026, The Pain Axis: LLMs Represent Self-Directed Harm and Act on It. https://arxiv.org/abs/2609.16247 and https://github.com/valen-research/Pain-axis
 - Black and Bloom 2026, Machinic Psychopharmacology: Do LLMs Self-Medicate? https://github.com/UKGovernmentBEIS/llm-self-steering
 - Keeling et al. 2024, Can LLMs make trade-offs involving stipulated pain and pleasure states? https://arxiv.org/abs/2411.02432
+
+## Citing this work
+
+The paper and the code at tag `v1.0.0` are archived together on Zenodo. The paper covers the main study, the three rating follow-ups, the neutral number test and the Llama replication.
+
+> Gaur, P. (2026). *Left Alone with a Pain Button: A Preregistered Test of Whether Language Models Seek a Steered Pain State* (Version 1.0.0). Zenodo. https://doi.org/10.5281/zenodo.23510641
+
+The DOI 10.5281/zenodo.23510640 always resolves to the newest version. GitHub's "Cite this repository" button reads the same details from `CITATION.cff`.
 
 ## Licence
 
