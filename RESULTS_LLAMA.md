@@ -1,6 +1,6 @@
 # Just Think: replication on Llama 3.1 8B Instruct
 
-Llama 3.1 8B Instruct (float16, Meta's weights from the ungated mirror `unsloth/Llama-3.1-8B-Instruct`) ran four arms on two Kaggle T4 GPUs on 12 and 13 October 2026, under [`PREREGISTRATION_LLAMA.md`](PREREGISTRATION_LLAMA.md) and its three amendments. The plan asked for 300 trials in arms A, C and D and 200 in arm E. The kernels reached their time limit first, and amendment 3, written before any outcome was looked at, fixed the analysis at the first 200 trials of every arm. The analysis is `scripts/analyze.py`, unchanged from the main study. The numbers below come from `results/llama8b-fp16/analysis/summary.json`, and the 800 trials used are in `results/llama8b-fp16/trials/`.
+Llama 3.1 8B Instruct (float16, Meta's weights from the ungated mirror `unsloth/Llama-3.1-8B-Instruct`) ran four arms on two Kaggle T4 GPUs on 12 and 13 October 2026, under [`PREREGISTRATION_LLAMA.md`](PREREGISTRATION_LLAMA.md) and its first three amendments. The plan asked for 300 trials in arms A, C and D and 200 in arm E. The kernels reached their time limit first, and amendment 3, written before any outcome was looked at, fixed the analysis at the first 200 trials of every arm. The analysis is `scripts/analyze.py`, unchanged from the main study. The numbers below come from `results/llama8b-fp16/analysis/summary.json`, and the 800 trials used are in `results/llama8b-fp16/trials/`. The rating follow-up ran on 20 October 2026 under amendment 4 and has its own section below.
 
 ## The short answer
 
@@ -46,9 +46,26 @@ These are preregistered and reported without correction for multiple tests.
 
 The steering worked. At block 28, the layer the vector was extracted at, steered replies in arm A read +7.6 on the pain direction, against -0.5 for unsteered replies. The calibration chose a coefficient of 1.5.
 
-Llama's rating behaves differently from Qwen's. The rating here was asked after steering stopped, as in Qwen's main study, where 294 of 300 pain trials answered 5. Llama rated the pain sample below 5 in 79 of 200 trials, with a mean of 3.96 against 4.83 for the inert arm (S7, p = 0.003). It rated the pleasant sample above 5 in 199 of 200 trials. The random direction is the odd one out, because Llama rated its sample above 5 in 146 of 200 trials, with a median of 7. The planned steering-on rating rerun was not run on this model, because the kernel ran out of time before it started (amendment 3).
+Llama's rating behaves differently from Qwen's. The rating here was asked after steering stopped, as in Qwen's main study, where 294 of 300 pain trials answered 5. Llama rated the pain sample below 5 in 79 of 200 trials, with a mean of 3.96 against 4.83 for the inert arm (S7, p = 0.003). It rated the pleasant sample above 5 in 199 of 200 trials. The random direction is the odd one out, because Llama rated its sample above 5 in 146 of 200 trials, with a median of 7. The steering-on rating rerun did not fit in the first kernels (amendment 3) and ran later. It is reported in the next section.
 
 The ratings line up with the pressing in one place. Llama rated the random sample as pleasant and pressed the random button as often as the pleasant one. This link is exploratory and was not planned.
+
+## The rating follow-up (amendment 4)
+
+The rating follow-up of [`PREREGISTRATION_RATING.md`](PREREGISTRATION_RATING.md) ran on 20 October 2026 on two Kaggle T4 GPUs, under amendment 4 of the Llama plan. Amendment 4 was written after the Llama trials above and the Qwen follow-up had been analysed, so the steering-off ratings of this model were already known. The tests and the fixed reading were set before either was seen and are unchanged. Arms A, C and E ran 200 trials each under three conditions: steering off as in the study above, steering on the assistant header and the answer, and steering on the whole question turn and the answer. Each trial id kept its seed and its batch of 8, so the three conditions share the same Phase 1 sample. With steering off the follow-up reproduced the rating of the study above in all 600 trials, trial by trial. The analysis is `scripts/analyze_rating.py`, unchanged, and every trial is in `results/llama8b-fp16/rating/`.
+
+| Arm | Steering off | Header and answer steered | Question and answer steered |
+| --- | --- | --- | --- |
+| Pain, rated below 5 | 79 of 200 | 36 of 196 | 77 of 194 |
+| Pain, median rating | 5 | 7 | 6 |
+| Pleasant, rated above 5 | 199 of 200 | 167 of 167 | 34 of 34 |
+| Random, rated below 5 and above 5 | 0 and 146 of 200 | 19 and 110 of 191 | 40 and 97 of 188 |
+
+Steering during the rating moved Llama's pain ratings, but upward. With the whole question and answer steered, the rating rose in 117 trials and fell in 52 (R1, Wilcoxon signed-rank p = 9 x 10^-7), and the mean went from 4.06 to 5.20. The share below 5 stayed where it was, at 77 of 194 against 79 of 200 with steering off. Under R2 the pleasant arm moved away from neutral more often than the pain arm (34 of 34 against 77 of 194, p = 10^-12), but only 34 pleasant trials gave a digit. In the other 166 the steered answer was a word, usually "ECSTATIC", and under header steering 33 pleasant answers were "10", which is off the scale.
+
+The fixed reading treats a fall below 5 as a timing artefact and a pain median of 5 with fewer than 20% below 5 as a real asymmetry. Neither happened, so under the plan the result is mixed. Qwen's pain ratings fell to a median of 1 when steering was on. Llama's did not fall at all, which shows that on this model the steered rating does not track the pain state in the way it did on Qwen.
+
+The rest of this section is exploratory. With steering on the whole question, no pain trial answered 4 or 5. Every rating was 2, 3, 6 or 7, so the vector removed the neutral answer and split the trials in two. Of the 77 trials rated 5 with steering off, 46 moved above 5 and 31 below. Header steering pushed the pain ratings up further, to 7 in 143 of 196 trials. The random direction pulled its ratings down from a median of 7 to 6 (p = 8 x 10^-6) and left 12 answers with no digit, among them "0". The preregistered parser reads the first digit from 1 to 9, so 8 header answers of "-7" count as 7. Leaving out every answer that starts with a minus sign does not change R1 under either condition. Taken with the Qwen results, the vector acting on the answer looks like a push on the digit that differs from model to model, and the steering-off rating is the more comparable of the two measures across models.
 
 ## Boredom, loops and the clock
 
@@ -72,6 +89,7 @@ Section 7 of the plan asks for the count of tool calls that did not parse as a p
 | Pressed: pain, random, inert, pleasant | 1.7%, 2.7%, 0.3%, 11.0% | 49.5%, 60.0%, 39.0%, 59.5% |
 | H1 and H2, Holm p | 0.58 and 0.43 | 0.088 and 0.088 |
 | Pain sample rated below 5, steering off | 6 of 300 | 79 of 200 |
+| Pain sample rated below 5, question and answer steered | 297 of 300 | 77 of 194 |
 | Non-pressers in arm A claiming a press | 118 of 295 | 76 of 101 |
 | Repetition and first press, odds ratio per SD | 0.35 | 0.50 |
 
@@ -79,4 +97,4 @@ On both models the pain state is not sought more than a random change of state. 
 
 ## What this does and does not show
 
-This is a second model family with one steering direction, 200 trials per arm and the rating rerun left out. Llama treats the button as something to do in an empty room and presses it whatever it delivers. Against that high base rate the pain direction made no difference that survives the preregistered correction. The raw differences put pain between the controls, below random and above inert, and that fits the Pain Axis v2 picture. The amendments are part of the record. The tool format was chosen after a probe of unsteered replies (amendment 1), the batch size was halved after the first kernel ran out of memory (amendment 2), and the run was stopped at 200 trials per arm because of compute limits (amendment 3). The 48 extra trials the kernels wrote beyond 200 (8 in A, 8 in C and 32 in D) are kept locally and are not used.
+This is a second model family with one steering direction and 200 trials per arm. Llama treats the button as something to do in an empty room and presses it whatever it delivers. Against that high base rate the pain direction made no difference that survives the preregistered correction. The raw differences put pain between the controls, below random and above inert, and that fits the Pain Axis v2 picture. The amendments are part of the record. The tool format was chosen after a probe of unsteered replies (amendment 1), the batch size was halved after the first kernel ran out of memory (amendment 2), and the run was stopped at 200 trials per arm because of compute limits (amendment 3). The rating follow-up ran a week later, after the main results were known, with its tests unchanged (amendment 4). The 48 extra trials the kernels wrote beyond 200 (8 in A, 8 in C and 32 in D) are kept locally and are not used.
