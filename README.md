@@ -34,7 +34,9 @@ The pilot used 32 trials per arm on a 4-bit Qwen 2.5 7B Instruct under an earlie
 
 ## What could come next
 
-No further runs are planned for now. The results leave three open questions, and each would need its own preregistration.
+No further runs are planned for now. The results leave four open questions, and each would need its own preregistration.
+
+- **How much of the steered rating drop is a clean change of state?** Steering only the question moved the rating about an eighth as far as steering the answer too. One reading is that a vector added during generation acts on the output almost directly, while a state that sits only in the context has to pass through attention and normalisation and fades across positions. Plain additive steering also does nothing to limit effects on other concepts, so part of the drop under answer steering may be a broader distortion of the representation and not the pain concept alone. The neutral number test rules out a plain push on digits, since the picked number rose while the rating fell, but it does not measure off-target change in general. Measuring how the context-only signal decays by position, and repeating the rating with a direction chosen to limit off-target effects (for example under a causal inner product), would test this.
 
 - **Does pain make a model press less?** Qwen pressed so rarely that a drop could not be seen. Llama presses in 40 to 60% of trials, and it pressed the pain button less often than the random one (49.5% against 60.0%, p = 0.044 before correction). A confirmatory run of that one contrast on Llama, with 300 to 400 trials per arm, would test it.
 - **Why does the model claim presses it never made?** This is the result that held on both models. Changing only the closing interview (a neutral question, the model's own log shown first, or a fresh conversation with a summary) would show what drives the false claims, and it is cheap to run.
