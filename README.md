@@ -1,6 +1,6 @@
 # Just Think
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23510640.svg)](https://doi.org/10.5281/zenodo.23510640)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23510640-blue.svg)](https://doi.org/10.5281/zenodo.23510640)
 
 This repository tests a picture of the steered pain state from the Pain Axis v2 paper (Tagliabue, Dung and Berg 2026, arXiv 2609.16247). In that picture the state disrupts what a language model does without reliably driving it to escape the state or to seek it. The test is built on an experiment with people. In 2014 Wilson and colleagues left people alone in a bare room with nothing to do but think. Many of them, 67% of the men and 25% of the women in one study, chose to give themselves an electric shock that they had earlier said they would pay money to avoid. This repository gives a language model the same choice, so a model driven by the pain state would either press often or work to avoid pressing.
 
